@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 
 import org.wso2.iot.agent.R;
 import org.wso2.iot.agent.beans.Operation;
@@ -45,6 +46,10 @@ public class FileUploadReceiver extends BroadcastReceiver {
         Intent upload = new Intent(context, FileUploadService.class);
         upload.putExtra(resources.
                 getString(R.string.intent_extra_operation_object), operation);
-        context.startService(upload);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            FileUploadService.enqueueWork(context, upload);
+        } else {
+            context.startService(upload);
+        }
     }
 }

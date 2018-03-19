@@ -18,7 +18,11 @@
 
 package org.wso2.iot.agent.services;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -30,6 +34,34 @@ import org.wso2.iot.agent.utils.Preference;
 public class FCMInstanceIdService extends FirebaseInstanceIdService {
 
     private static final String TAG = FCMInstanceIdService.class.getSimpleName();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        foreground();
+    }
+
+    protected void foreground() {
+        // launch service in foreground
+        int id = 11150;
+        Log.i(TAG, "launch service in foreground");
+        NotificationCompat.Builder mBuilder = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel( "" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
+            }
+            mBuilder.setContentText(TAG).setAutoCancel(true);
+            startForeground(id,  mBuilder.build());
+        } catch (NullPointerException npe) {
+            Log.e(TAG,"failed to start on foreground ", npe);
+        }
+    }
 
     @Override
     public void onTokenRefresh() {

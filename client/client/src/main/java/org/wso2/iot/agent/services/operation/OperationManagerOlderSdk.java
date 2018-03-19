@@ -24,6 +24,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import org.json.JSONArray;
@@ -40,6 +41,7 @@ import org.wso2.iot.agent.beans.Operation;
 import org.wso2.iot.agent.services.AppLockService;
 import org.wso2.iot.agent.services.NotificationService;
 import org.wso2.iot.agent.services.ResultPayload;
+import org.wso2.iot.agent.services.kiosk.KioskMsgAlarmService;
 import org.wso2.iot.agent.utils.CommonUtils;
 import org.wso2.iot.agent.utils.Constants;
 import org.wso2.iot.agent.utils.FileUploadCancelReceiver;
@@ -520,8 +522,11 @@ public class OperationManagerOlderSdk extends OperationManager {
                 calendar.add(Calendar.SECOND, 1); // First time
                 long frequency= 1 * 1000; // In ms
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
-
-                getContext().startService(restrictionIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    AppLockService.enqueueWork(getContext(), restrictionIntent);
+                } else {
+                    getContext().startService(restrictionIntent);
+                }
             } else if (Constants.OWNERSHIP_COPE.equals(ownershipType)) {
 
                 for (String packageName : appRestriction.getRestrictedList()) {

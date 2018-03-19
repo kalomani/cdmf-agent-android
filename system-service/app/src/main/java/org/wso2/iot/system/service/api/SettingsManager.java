@@ -25,6 +25,8 @@ import android.util.Log;
 import org.wso2.iot.system.service.BuildConfig;
 import org.wso2.iot.system.service.SystemService;
 
+import static android.app.admin.DevicePolicyManager.WIPE_EXTERNAL_STORAGE;
+
 public class SettingsManager {
     private static final String TAG = SettingsManager.class.getName();
 
@@ -34,10 +36,17 @@ public class SettingsManager {
         Log.i(TAG, "enabled device owner");
     }
 
+    @SuppressWarnings("deprecation")
     public static void clearDeviceOwner() {
         Log.i(TAG, "disabled device owner");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            SystemService.devicePolicyManager.clearDeviceOwnerApp(BuildConfig.APPLICATION_ID);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            SystemService.devicePolicyManager.wipeData(WIPE_EXTERNAL_STORAGE);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                SystemService.devicePolicyManager.clearDeviceOwnerApp(BuildConfig.APPLICATION_ID);
+            } else {
+                Log.i(TAG, "clear device owner not possible");
+            }
         }
     }
 

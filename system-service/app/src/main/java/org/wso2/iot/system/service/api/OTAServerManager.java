@@ -20,12 +20,15 @@ package org.wso2.iot.system.service.api;
 
 import android.annotation.NonNull;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -39,6 +42,8 @@ import android.os.StatFs;
 import android.os.SystemProperties;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.WindowManager;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.iot.system.service.MainActivity;
@@ -121,7 +126,8 @@ public class OTAServerManager {
     public OTAServerManager(Context context) throws MalformedURLException {
         serverConfig = new OTAServerConfig(Build.PRODUCT, context);
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "OTA Wakelock");
+        // wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "OTA Wakelock");
+        // TODO getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         this.context = context;
     }
 
@@ -417,7 +423,7 @@ public class OTAServerManager {
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
                     }
 
-                    request.setDestinationToSystemCache();
+                    // request.setDestinationToSystemCache();
                     //Save the timestamp when the download is started (initially).
                     startTimeStamp = Calendar.getInstance().getTime().getTime();
                     downloadReference = downloadManager.enqueue(request);
@@ -463,7 +469,8 @@ public class OTAServerManager {
                             }
 
                             //Get the OTA download file name and stored it in shared preference "firmware_upgrade_file_name_pref"
-                            String otaPackageName = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+                            String otaPackageName = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_URI));
+                            Log.d(TAG, "OTA package name: " + otaPackageName);
                             if (otaPackageName != null && !otaPackageName.isEmpty()) {
                                 if (!isFileNameAvailable) {
                                     Preference.putString(context, context.getResources().
@@ -661,7 +668,7 @@ public class OTAServerManager {
 
     public long getFreeDiskSpace() {
         StatFs statFs = new StatFs(FileUtils.getUpgradePackageDirectory());
-        long freeDiskSpace = (long) statFs.getAvailableBlocks() * (long) statFs.getBlockSize();
+        long freeDiskSpace = (long) statFs.getAvailableBlocksLong() * (long) statFs.getBlockSizeLong();
         /*if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Free disk space: " + freeDiskSpace);
         }*/
@@ -748,9 +755,22 @@ public class OTAServerManager {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, requestID,notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.notification)
+        PendingIntent contentIntent = PendingIntent.getActivity(context, requestID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String NOTIFICATION_CHANNEL_ID = "channel_id_1";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notification", NotificationManager.IMPORTANCE_DEFAULT);
+
+            // Configure the notification channel.
+            notificationChannel.setDescription("Notification service");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            notificationChannel.enableVibration(true);
+            mNotificationManager.createNotificationChannel(notificationChannel);
+        }
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
+        mBuilder.setSmallIcon(R.drawable.notification)
                 .setContentTitle("Message from IoT Agent")
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(notificationMessage))

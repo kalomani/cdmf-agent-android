@@ -438,6 +438,7 @@ public class KioskActivity extends Activity {
     }
 
     @TargetApi(21)
+    @SuppressWarnings("deprecation")
     private void startRing() {
 
         if (audio != null) {

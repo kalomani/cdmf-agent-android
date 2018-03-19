@@ -18,11 +18,13 @@
 
 package org.wso2.iot.agent.services;
 
-import android.app.IntentService;
+// import android.app.IntentService;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -52,7 +54,9 @@ import java.util.Map;
  * For this service to function properly, all the Mutual SSL related configurations should be properly performed.
  * Please refer product documentation for more information on Auto Enrollment process.
  */
-public class EnrollmentService extends IntentService implements APIResultCallBack, AuthenticationCallback {
+public class EnrollmentService extends JobIntentService implements APIResultCallBack, AuthenticationCallback {
+    // Unique job ID for this service.
+    private static final int JOB_ID = 106;
     private static final String TAG = EnrollmentService.class.getName();
     private Context context;
     private DeviceInfoPayload deviceInfoBuilder;
@@ -60,11 +64,16 @@ public class EnrollmentService extends IntentService implements APIResultCallBac
     private ComponentName cdmDeviceAdmin;
 
     public EnrollmentService() {
-        super(TAG);
+        super(/*TAG*/);
+    }
+
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, EnrollmentService.class, JOB_ID, work);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleWork(Intent intent) {
         context = this.getApplicationContext();
         info = new DeviceInfo(context);
         cdmDeviceAdmin = new ComponentName(this, AgentDeviceAdminReceiver.class);
@@ -146,7 +155,11 @@ public class EnrollmentService extends IntentService implements APIResultCallBac
         }
         if (!CommonUtils.isServiceRunning(context, LocationService.class)){
             Intent serviceIntent = new Intent(context, LocationService.class);
-            context.startService(serviceIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent);
+            } else {
+                context.startService(serviceIntent);
+            }
         }
         startEvents();
         startPolling();

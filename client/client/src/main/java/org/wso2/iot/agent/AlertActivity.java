@@ -114,8 +114,12 @@ public class AlertActivity extends Activity {
 				payload = extras.getString(getResources().getString(R.string.intent_extra_payload));
 			}
 		}
-		if (extras.containsKey(getResources().getString(R.string.intent_extra_operation_id))) {
-			operationId = extras.getInt(getResources().getString(R.string.intent_extra_operation_id));
+		try {
+			if (extras.containsKey(getResources().getString(R.string.intent_extra_operation_id))) {
+				operationId = extras.getInt(getResources().getString(R.string.intent_extra_operation_id));
+			}
+		} catch (NullPointerException npe) {
+			Log.e(TAG, "Failed to get id key", npe);
 		}
 
 		txtMessageTitle.setText(messageTitle);
@@ -203,7 +207,11 @@ public class AlertActivity extends Activity {
 				intent.putExtra(prefix + getResources().getString(R.string.dns), dnsServer);
 			}
 
-			startService(intent);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				startForegroundService(intent);
+			} else {
+				startService(intent);
+			}
 		}
 
 		AlertActivity.this.finish();
@@ -213,6 +221,7 @@ public class AlertActivity extends Activity {
 	 * This method is used to start ringing the phone.
 	 */
 	@TargetApi(21)
+	@SuppressWarnings("deprecation")
 	private void startRing() {
 		if (audio != null) {
 			ringerMode = audio.getRingerMode();
@@ -263,7 +272,11 @@ public class AlertActivity extends Activity {
 		if (notificationService == null) {
 			Log.e(TAG, "Cannot update notification status");
 		}
-		notificationService.updateNotification(id);
+		try {
+			notificationService.updateNotification(id);
+		} catch (NullPointerException npe) {
+			Log.e(TAG, "Failed to update Notification for " + id, npe);
+		}
 	}
 
 }

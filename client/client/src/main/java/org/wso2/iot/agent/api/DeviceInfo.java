@@ -156,7 +156,7 @@ public class DeviceInfo {
 	 * @return - Device WiFi MAC.
 	 */
 	public String getMACAddress() {
-		WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		WifiInfo wInfo = wifiManager.getConnectionInfo();
 		return wInfo.getMacAddress();
 	}
@@ -191,7 +191,11 @@ public class DeviceInfo {
 	 * @return - Hardware serial number.
 	 */
 	public String getDeviceSerialNumber() {
-		return Build.SERIAL;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			return Build.getSerial();
+		} else {
+			return Build.SERIAL;
+		}
 	}
 
 	/**

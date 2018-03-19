@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -42,6 +43,7 @@ import org.wso2.iot.agent.utils.CommonUtils;
 import org.wso2.iot.agent.utils.Constants;
 import org.wso2.iot.agent.utils.Preference;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -88,7 +90,11 @@ public class AgentStartupReceiver extends BroadcastReceiver {
 
         if (!CommonUtils.isServiceRunning(context, LocationService.class)) {
             Intent serviceIntent = new Intent(context, LocationService.class);
-            context.startService(serviceIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent);
+            } else {
+                context.startService(serviceIntent);
+            }
         }
 
         if (Preference.getBoolean(context, Constants.PreferenceFlag.REGISTERED)) {

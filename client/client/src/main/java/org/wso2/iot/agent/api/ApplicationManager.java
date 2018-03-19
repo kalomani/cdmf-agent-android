@@ -140,8 +140,8 @@ public class ApplicationManager {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         Uri apkURI = FileProvider.getUriForFile(
                                 context,
-                                context.getApplicationContext()
-                                        .getPackageName() + ".provider", new File(downloadDirectoryPath + File.separator +
+                                context.getApplicationContext().getPackageName() + ".provider",
+                                new File(downloadDirectoryPath + File.separator +
                                         resources.getString(R.string.download_mgr_download_file_name)));
                         triggerInstallation(apkURI);
 
@@ -252,8 +252,13 @@ public class ApplicationManager {
      */
     public List<String> getAppsOfUser() {
         List<String> packagesInstalledByUser = new ArrayList<>();
-        int flags = PackageManager.GET_META_DATA | PackageManager.GET_SHARED_LIBRARY_FILES
-                | PackageManager.GET_UNINSTALLED_PACKAGES;
+        int flags = PackageManager.GET_META_DATA | PackageManager.GET_SHARED_LIBRARY_FILES;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            flags = flags | PackageManager.MATCH_UNINSTALLED_PACKAGES;
+        } else {
+            flags = flags | PackageManager.GET_UNINSTALLED_PACKAGES;
+        }
         List<ApplicationInfo> applications = packageManager.getInstalledApplications(flags);
         for (ApplicationInfo appInfo : applications) {
             if (!((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1)) {
@@ -292,6 +297,7 @@ public class ApplicationManager {
                 return true;
             }
         } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Failed to get package information: " + e);
             return false;
         }
         return false;
@@ -518,16 +524,17 @@ public class ApplicationManager {
      * @param packageName - Application package name should be passed in as a String.
      */
     public void uninstallApplication(String packageName, String schedule) throws AndroidAgentException {
-        if (packageName != null &&
-                !packageName.contains(resources.getString(R.string.application_package_prefix))) {
-            packageName = resources.getString(R.string.application_package_prefix) + packageName;
-        }
 
         if(!this.isPackageInstalled(packageName)){
             String message = "Package is not installed in the device or invalid package name";
             Preference.putString(context, context.getResources().getString(R.string.app_uninstall_status), APP_STATE_UNINSTALLED_FAILED);
             Preference.putString(context, context.getResources().getString(R.string.app_uninstall_failed_message), message);
-            throw new AndroidAgentException("Package is not installed in the device");
+            throw new AndroidAgentException("Package " + packageName + " is not installed in the device");
+        }
+
+        if (packageName != null &&
+                !packageName.startsWith(resources.getString(R.string.application_package_prefix))) {
+            packageName = resources.getString(R.string.application_package_prefix) + packageName;
         }
 
         if (schedule != null && !schedule.trim().isEmpty() && !schedule.equals("undefined")) {

@@ -64,11 +64,11 @@ public class WiFiConfig {
     private static final String KEYSTORE_PKCS12 = "pkcs12";
     private Context context;
 
-    public WiFiConfig(Context context) {
-        this.context = context.getApplicationContext();
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    public WiFiConfig(Context contextInfo) {
+        context = contextInfo.getApplicationContext();
+        wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (!isConnected(context, ConnectivityManager.TYPE_WIFI)) {
             wifiManager.setWifiEnabled(true);
         }

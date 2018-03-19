@@ -18,6 +18,8 @@
 
 package org.wso2.iot.agent.services;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,6 +32,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
@@ -112,12 +115,35 @@ public class NetworkInfoService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    protected void foreground() {
+        // launch service in foreground
+        int id = 11100;
+        Log.i(TAG, "launch service in foreground");
+        NotificationCompat.Builder mBuilder = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel( "" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
+            }
+            mBuilder.setContentText(TAG).setAutoCancel(true);
+            startForeground(id,  mBuilder.build());
+        } catch (NullPointerException npe) {
+            Log.e(TAG,"failed to start on foreground ", npe);
+        }
+    }
+
     @Override
     public void onCreate() {
         thisInstance = this;
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Creating service");
         }
+        foreground();
         mapper = new ObjectMapper();
         info = getNetworkInfo();
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);

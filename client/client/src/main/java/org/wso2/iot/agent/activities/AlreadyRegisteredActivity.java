@@ -210,9 +210,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             // This is to handle permission obtaining for Android N devices where operations such
             // as mute that can cause a device to go into "do not disturb" will need additional
-            // permission. Added here as well to support already enrolled devices to optain the
+            // permission. Added here as well to support already enrolled devices to obtain the
             // permission without reenrolling.
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M && !notificationManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !notificationManager
                     .isNotificationPolicyAccessGranted()) {
                 CommonDialogUtils.getAlertDialogWithOneButtonAndTitle(context,
                         getResources().getString(R.string.dialog_do_not_distrub_title),
@@ -641,7 +641,8 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == ACTIVATION_REQUEST) {
+        Log.d(TAG, "onActivityResult; requestCode " + requestCode + "result code" + resultCode);
+        if (requestCode == ACTIVATION_REQUEST) {
 			if (resultCode == AppCompatActivity.RESULT_OK) {
 				startEvents();
 				syncWithServer();
@@ -650,9 +651,11 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 			} else {
 				Log.i("onActivityResult", "Administration enable FAILED!");
 			}
-		}
+
+        }
 	}
     private void syncWithServer() {
+	    Log.d(TAG, "Sync with Server");
         Animation rotate = AnimationUtils.loadAnimation(context, R.anim.clockwise_refresh);
         imageViewRefresh.startAnimation(rotate);
         textViewLastSync.setText(R.string.txt_sync);

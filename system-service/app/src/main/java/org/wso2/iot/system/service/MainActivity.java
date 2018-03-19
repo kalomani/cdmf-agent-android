@@ -28,10 +28,12 @@ import android.util.Log;
 
 public class MainActivity extends Activity {
     private static final int ACTIVATION_REQUEST = 47;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
         ComponentName receiver = new ComponentName(this, ServiceDeviceAdminReceiver.class);
         startDeviceAdminPrompt(receiver);
@@ -43,14 +45,17 @@ public class MainActivity extends Activity {
      * @param cdmDeviceAdmin - Device admin component.
      */
     private void startDeviceAdminPrompt(ComponentName cdmDeviceAdmin) {
+        Log.d(TAG, "startDeviceAdminPrompt");
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         if (!devicePolicyManager.isAdminActive(cdmDeviceAdmin)) {
+            Log.d(TAG, "not admin active");
             Intent deviceAdminIntent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
             deviceAdminIntent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cdmDeviceAdmin);
             deviceAdminIntent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
                                        getResources().getString(R.string.device_admin_enable_alert));
             startActivityForResult(deviceAdminIntent, ACTIVATION_REQUEST);
         } else {
+            Log.d(TAG, "not admin active");
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |
@@ -61,6 +66,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult with requestCode: " + requestCode + " and resultCode: " + requestCode);
         if (requestCode == ACTIVATION_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 finish();

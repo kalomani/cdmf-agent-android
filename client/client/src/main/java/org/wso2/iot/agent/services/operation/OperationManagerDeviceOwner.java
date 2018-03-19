@@ -787,7 +787,7 @@ public class OperationManagerDeviceOwner extends OperationManager {
             if(!Preference.getBoolean(getContext(),Constants.PreferenceCOSUProfile.ENABLE_LOCKDOWN)) {
                 Preference.putBoolean(getContext(), Constants.PreferenceCOSUProfile.ENABLE_LOCKDOWN, true);
                 KioskAlarmReceiver kioskAlarmReceiver = new KioskAlarmReceiver();
-                kioskAlarmReceiver.startAlarm(getContext());
+                kioskAlarmReceiver.startAlarm(getContext(), new Intent(getContext(), OperationManagerDeviceOwner.class));
             }
 
             operation.setStatus(getContextResources().getString(R.string.operation_value_completed));

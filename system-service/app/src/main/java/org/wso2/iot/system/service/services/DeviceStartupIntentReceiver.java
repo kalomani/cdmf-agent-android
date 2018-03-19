@@ -43,9 +43,9 @@ public class DeviceStartupIntentReceiver extends BroadcastReceiver {
 	public void onReceive(final Context context, Intent intent) {
 
 		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-			boolean isAvailabledownloadReference = Preference.getBoolean(context, context.getResources().getString(R.string.download_manager_reference_id_available));
-            //Log.d(TAG, "Download manager reference id availability : "+isAvailabledownloadReference);
-			if(isAvailabledownloadReference){
+			boolean isAvailableDownloadReference = Preference.getBoolean(context, context.getResources().getString(R.string.download_manager_reference_id_available));
+            //Log.d(TAG, "Download manager reference id availability : "+isAvailableDownloadReference);
+			if(isAvailableDownloadReference){
 				OTADownload otaDownload = new OTADownload(context);
 				OTAServerManager otaServerManager = otaDownload.getOtaServerManager();
 				otaServerManager.startDownloadUpgradePackage(otaServerManager);

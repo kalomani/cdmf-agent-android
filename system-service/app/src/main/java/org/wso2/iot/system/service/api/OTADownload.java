@@ -38,6 +38,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 
 public class OTADownload implements OTAServerManager.OTAStateChangeListener {
@@ -96,7 +97,7 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
         }
         int numberToFormat = (int) (Math.log(bytes) / Math.log(unit));
         String prefix = (isSI ? SI_UNITS_INDEX : BINARY_UNITS_INDEX).charAt(numberToFormat - 1) + (isSI ? "" : "i");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, numberToFormat), prefix);
+        return String.format(Locale.US,"%.1f %sB", bytes / Math.pow(unit, numberToFormat), prefix);
     }
 
     public void startOTA() {

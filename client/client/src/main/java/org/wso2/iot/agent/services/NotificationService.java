@@ -18,6 +18,7 @@
 
 package org.wso2.iot.agent.services;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -124,14 +125,22 @@ public class NotificationService extends BroadcastReceiver {
      * @param messageText message text to be displayed
      */
     public void showNotification(int operationId, String messageTitle, String messageText) {
-
+        int id = 11120;
+        NotificationCompat.Builder mBuilder = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Intent notification = new Intent(context, NotificationReceiver.class);
             notification.putExtra(Constants.OPERATION_ID, operationId);
             PendingIntent dismiss = PendingIntent.getBroadcast(context, operationId, notification, PendingIntent.FLAG_ONE_SHOT);
-            NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(context)
-                            .setSmallIcon(R.drawable.ic_notifications_white_24dp)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel("" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(context, notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(context);
+            }
+            mBuilder.setSmallIcon(R.drawable.ic_notifications_white_24dp)
                             .setContentTitle(messageTitle)
                             .setContentText(messageText)
                             .setPriority(android.app.Notification.PRIORITY_MAX)

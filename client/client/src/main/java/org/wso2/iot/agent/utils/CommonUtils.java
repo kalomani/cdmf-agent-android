@@ -18,6 +18,7 @@
 package org.wso2.iot.agent.utils;
 
 import android.app.ActivityManager;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
@@ -33,7 +34,9 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.UserManager;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Base64;
@@ -97,6 +100,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.x500.X500Principal;
+
 
 /**
  * This class represents all the common functions used throughout the application.
@@ -416,7 +420,12 @@ public class CommonUtils {
 				}
 				intent.putExtra("command", command);
 			}
-			context.startServiceAsUser(intent, android.os.Process.myUserHandle());
+            // context.startServiceAsUser(intent, android.os.Process.myUserHandle());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundServiceAsUser(intent, android.os.Process.myUserHandle());
+            } else {
+                context.startServiceAsUser(intent, android.os.Process.myUserHandle());
+            }
 		} else {
 			Log.e(TAG, "System app not enabled.");
 		}
@@ -429,7 +438,12 @@ public class CommonUtils {
 			if (explicitIntent != null) {
 				intent = explicitIntent;
 			}
-			context.startServiceAsUser(intent, android.os.Process.myUserHandle());
+            // context.startServiceAsUser(intent, android.os.Process.myUserHandle());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			    context.startForegroundServiceAsUser(intent, android.os.Process.myUserHandle());
+            } else {
+                context.startServiceAsUser(intent, android.os.Process.myUserHandle());
+            }
 		} else {
 			Log.e(TAG, "System app not enabled.");
 		}
@@ -645,39 +659,73 @@ public class CommonUtils {
 
 	public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
 		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (serviceClass.getName().equals(service.service.getClassName())) {
-				return true;
-			}
-		}
+		try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                List<ActivityManager.RunningAppProcessInfo> list = manager.getRunningAppProcesses();
+                if (list != null) {
+                    String[] activePackages = list.get(0).pkgList;
+                    for (int i = 0; i < activePackages.length; i++) {
+                        for (String app : activePackages) {
+                            if (app.equals(serviceClass.getPackage().getName())) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                    if (serviceClass.getName().equals(service.service.getClassName())) {
+                        return true;
+                    }
+                }
+            }
+        } catch (NullPointerException npe) {
+		    Log.e(TAG, "is service running " + serviceClass.getName(), npe);
+        }
 		return false;
 	}
 
 	public static Location getLocation(Context context) {
 		Intent serviceIntent = new Intent(context, LocationService.class);
-		context.startService(serviceIntent);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			context.startForegroundService(serviceIntent);
+		} else {
+			context.startService(serviceIntent);
+		}
 		return LocationUpdateReceiver.getLocation();
 	}
 
 	public static void displayNotification(Context context, int icon, String title, String message, Class<?> sourceActivityClass, String tag, int id){
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-		mBuilder.setSmallIcon(icon);
-		mBuilder.setContentTitle(title);
-		mBuilder.setContentText(message);
-		mBuilder.setOngoing(true);
-		mBuilder.setOnlyAlertOnce(true);
-
-		Intent resultIntent = new Intent(context, sourceActivityClass);
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-		stackBuilder.addParentStack(sourceActivityClass);
-
-		// Adds the Intent that starts the Activity to the top of the stack
-		stackBuilder.addNextIntent(resultIntent);
-		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-		mBuilder.setContentIntent(resultPendingIntent);
-
 		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(tag, id, mBuilder.build());
+		NotificationCompat.Builder mBuilder = null;
+		try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationChannel notificationChannel = new NotificationChannel("" + id, tag, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(context.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(context.getApplicationContext());
+            }
+            mBuilder.setSmallIcon(icon);
+            mBuilder.setContentTitle(title);
+            mBuilder.setContentText(message);
+            mBuilder.setOngoing(true);
+            mBuilder.setOnlyAlertOnce(true);
+
+            Intent resultIntent = new Intent(context, sourceActivityClass);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(sourceActivityClass);
+
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            mNotificationManager.notify(tag, id, mBuilder.build());
+        } catch (NullPointerException npe) {
+		    Log.e(TAG, "Error display notification: ", npe);
+        }
 	}
 
 	public static Date currentDate() {
@@ -733,15 +781,29 @@ public class CommonUtils {
 		return Math.round((Math.abs(timeDistance) / 1000) / 60);
 	}
 
+	@RequiresApi(21)
 	public static void allowUnknownSourcesForProfile(final Context context, final boolean isEnabled) {
-		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			final DevicePolicyManager manager = (DevicePolicyManager) context
 					.getSystemService(Context.DEVICE_POLICY_SERVICE);
 			if (manager != null && manager.isProfileOwnerApp(context.getApplicationContext()
 					.getPackageName())) {
 				final ComponentName cdmAdmin = new ComponentName(context, AgentDeviceAdminReceiver.class);
-				manager.setSecureSetting(cdmAdmin, Settings.Secure.INSTALL_NON_MARKET_APPS,
-						isEnabled ? "1" : "0");
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				    try {
+                        if (isEnabled) {
+                            manager.addUserRestriction(cdmAdmin, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES);
+                        } else {
+                            manager.clearUserRestriction(cdmAdmin, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES);
+                        }
+                    } catch (SecurityException se) {
+				        Log.e(TAG, "allow or disallow unknown sources ", se);
+                    }
+				} else {
+                    manager.setGlobalSetting(cdmAdmin, Settings.Global.INSTALL_NON_MARKET_APPS, isEnabled ? "1" : "0");
+                    // manager.setSecureSetting(cdmAdmin, Settings.Secure.INSTALL_NON_MARKET_APPS, isEnabled ? "1" : "0");
+				}
 				Log.i(TAG, "Enable unknown sources: " + String.valueOf(isEnabled));
 			}
 		}

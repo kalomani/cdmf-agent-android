@@ -58,6 +58,7 @@ public class ScreenShareActivity extends Activity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
@@ -69,7 +70,11 @@ public class ScreenShareActivity extends Activity {
                                 .putExtra(ScreenSharingService.EXTRA_RESULT_INTENT, data)
                                 .putExtra(Constants.MAX_WIDTH, maxWidth)
                                 .putExtra(Constants.MAX_HEIGHT, maxHeight);
-                startService(i);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(i);
+                } else {
+                    startService(i);
+                }
             }
         }
         ScreenShareActivity.this.finish();

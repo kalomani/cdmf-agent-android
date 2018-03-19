@@ -54,7 +54,7 @@ public abstract class CommonDialogUtils {
 	 * @param context              - The Activity which needs this alert dialog.
 	 * @param message              - The message in the alert.
 	 * @param positiveBtnLabel     - The label of the positive button.
-	 * @param negetiveBtnLabel     - The label of the negative button.
+	 * @param negativeBtnLabel     - The label of the negative button.
 	 * @param positiveClickListener- The onClickListener of the positive button.
 	 * @param negativeClickListener- The onClickListener of the negative button.
 	 * @return - The generated Alert Dialog.
@@ -62,13 +62,13 @@ public abstract class CommonDialogUtils {
 	public static AlertDialog.Builder getAlertDialogWithTwoButton(Context context,
                                       String message,
                                       String positiveBtnLabel,
-                                      String negetiveBtnLabel,
+                                      String negativeBtnLabel,
                                       DialogInterface.OnClickListener positiveClickListener,
                                       DialogInterface.OnClickListener negativeClickListener) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(message).setPositiveButton(positiveBtnLabel, positiveClickListener)
-		       .setNegativeButton(negetiveBtnLabel, negativeClickListener);
+		       .setNegativeButton(negativeBtnLabel, negativeClickListener);
 
 		return builder;
 	}
@@ -96,7 +96,7 @@ public abstract class CommonDialogUtils {
 	 * @param title                - The title of the message.
 	 * @param message              - The message in the alert.
 	 * @param positiveBtnLabel     - The label of the positive button.
-	 * @param negetiveBtnLabel     - The label of the negative button.
+	 * @param negativeBtnLabel     - The label of the negative button.
 	 * @param positiveClickListener- The onClickListener of the positive button.
 	 * @param negativeClickListener- The onClickListener of the negative button.
 	 * @return - The generated Alert Dialog.
@@ -105,14 +105,14 @@ public abstract class CommonDialogUtils {
                                       String title,
                                       String message,
                                       String positiveBtnLabel,
-                                      String negetiveBtnLabel,
+                                      String negativeBtnLabel,
                                       DialogInterface.OnClickListener positiveClickListener,
                                       DialogInterface.OnClickListener negativeClickListener) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle(title);
 		builder.setMessage(message).setPositiveButton(positiveBtnLabel, positiveClickListener)
-		       .setNegativeButton(negetiveBtnLabel, negativeClickListener);
+		       .setNegativeButton(negativeBtnLabel, negativeClickListener);
 
 		return builder;
 	}
@@ -173,11 +173,12 @@ public abstract class CommonDialogUtils {
 	 */
 	public static ProgressDialog showProgressDialog(Context context, String title, String message,
 	                                                OnCancelListener cancelListener) {
+
 		ProgressDialog progressDialog = ProgressDialog.show(context, title, message, true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(cancelListener);
 
-		return progressDialog;
+        return progressDialog;
 	}
 
 	/**
@@ -196,7 +197,7 @@ public abstract class CommonDialogUtils {
 	 * @param context              - The Activity which needs this alert dialog.
 	 * @param message              - The message in the alert.
 	 * @param positiveBtnLabel     - The label of the positive button.
-	 * @param negetiveBtnLabel     - The label of the negative button.
+	 * @param negativeBtnLabel     - The label of the negative button.
 	 * @param positiveClickListener- The onClickListener of the positive button.
 	 * @param negativeClickListener- The onClickListener of the negative button.
 	 * @param input                - Edit text input.
@@ -205,14 +206,14 @@ public abstract class CommonDialogUtils {
 	public static AlertDialog.Builder getAlertDialogWithTwoButtonAndEditView(Context context,
                                      String message,
                                      String positiveBtnLabel,
-                                     String negetiveBtnLabel,
+                                     String negativeBtnLabel,
                                      DialogInterface.OnClickListener positiveClickListener,
                                      DialogInterface.OnClickListener negativeClickListener,
                                      EditText input) {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(message).setPositiveButton(positiveBtnLabel, positiveClickListener)
-		       .setNegativeButton(negetiveBtnLabel, negativeClickListener);
+		       .setNegativeButton(negativeBtnLabel, negativeClickListener);
 
 		LinearLayout.LayoutParams params =
 				new LinearLayout.LayoutParams(

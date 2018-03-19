@@ -50,7 +50,7 @@ public class LockActivity extends Activity {
         super.onPostCreate(savedInstanceState);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.O_MR1)
     private void enablePinnedActivity() {
         startLockTask();
         if (Constants.DEBUG_MODE_ENABLED) {
@@ -58,7 +58,7 @@ public class LockActivity extends Activity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.O_MR1)
     private void disablePinnedActivity() {
         adminMessage.setText(getResources().getString(R.string.txt_unlock_activity));
         if (Constants.DEBUG_MODE_ENABLED) {

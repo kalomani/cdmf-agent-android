@@ -20,6 +20,7 @@ package org.wso2.iot.agent.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -54,7 +55,11 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
         if (Constants.AUTO_ENROLLMENT_BACKGROUND_SERVICE_ENABLED) {
             Intent intent = new Intent(this, EnrollmentService.class);
-            startService(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                EnrollmentService.enqueueWork(this, intent);
+            } else {
+                startService(intent);
+            }
             Log.i(TAG, "Enrollment service started");
         } else if (instantiatedActivityClass != null) {
             startActivity();

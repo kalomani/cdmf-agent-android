@@ -19,7 +19,9 @@
 package org.wso2.iot.system.service;
 
 import android.annotation.TargetApi;
-import android.app.IntentService;
+// import android.app.IntentService;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -35,6 +37,9 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.SystemProperties;
 import android.os.UserManager;
+import android.support.annotation.Nullable;
+import android.support.v4.app.JobIntentService;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.Display;
@@ -98,8 +103,8 @@ import static android.os.UserManager.ENSURE_VERIFY_APPS;
  * to the IoT Agent app. Agent can bind to this service and execute permitted operations by
  * sending necessary parameters.
  */
-public class SystemService extends IntentService {
-
+public class SystemService extends JobIntentService {
+    private static int JOB_ID = 1331235;
     private static final String TAG = SystemService.class.getSimpleName();
     private static final int ACTIVATION_REQUEST = 0x00000002;
     private static final String BUILD_DATE_UTC_PROPERTY = "ro.build.date.utc";
@@ -119,11 +124,49 @@ public class SystemService extends IntentService {
     private static String[] AUTHORIZED_PINNING_APPS;
 
     public SystemService() {
-        super(TAG);
+        super(/*TAG*/);
+        Log.d(TAG, "creation ------------- ");
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate ------------- ");
+        foreground();
+    }
+
+    /*
+    static void enqueueWork(Context context, Intent work) {
+        Log.d(TAG, "enqueueWork");
+        enqueueWork(context, SystemService.class, JOB_ID, work);
+    }*/
+
+    protected void foreground() {
+        Log.d(TAG, "foreground");
+        // launch service in foreground
+        int id = 1111255;
+        Log.i(TAG, "launch service in foreground");
+        NotificationCompat.Builder mBuilder = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel("" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
+            }
+            mBuilder.setSmallIcon(R.mipmap.ic_launcher).setContentText(TAG).setAutoCancel(true);
+            startForeground(id,  mBuilder.build());
+        } catch (NullPointerException npe) {
+            Log.e(TAG,"failed to start on foreground ", npe);
+        }
+    }
+
+    @Override
+    protected void onHandleWork(Intent intent) {
+        Log.d(TAG, "onHandleWork");
         context = this.getApplicationContext();
         cdmDeviceAdmin = new ComponentName(this, ServiceDeviceAdminReceiver.class);
         devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -131,6 +174,7 @@ public class SystemService extends IntentService {
         wmgr = (WindowManager) getSystemService(WINDOW_SERVICE);
         String AGENT_PACKAGE_NAME = context.getPackageName();
         AUTHORIZED_PINNING_APPS = new String[]{AGENT_PACKAGE_NAME, Constants.AGENT_APP_PACKAGE_NAME};
+
         if (!devicePolicyManager.isAdminActive(cdmDeviceAdmin)) {
             startAdmin();
         } else {
@@ -138,7 +182,7 @@ public class SystemService extends IntentService {
         All requests are handled on a single worker thread. They may take as long as necessary
 		(and will not block the application's main thread),
 		but only one request will be processed at a time.*/
-            Log.d(TAG, "Entered onHandleIntent of the Command Runner Service.");
+            Log.d(TAG, "Entered onHandleWork of the Command Runner Service.");
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 operationCode = extras.getString("operation");
@@ -251,6 +295,7 @@ public class SystemService extends IntentService {
     }
 
     private void startAdmin() {
+        Log.d(TAG, "startAdmin");
         Intent intentDeviceAdmin = new Intent(this, MainActivity.class);
         intentDeviceAdmin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intentDeviceAdmin);
@@ -262,6 +307,7 @@ public class SystemService extends IntentService {
      * @param operationCode - Operation object.
      */
     public void doTask(String operationCode) {
+        Log.d(TAG, "doTask");
         switch (operationCode) {
             case Constants.Operation.DEVICE_LOCK:
                 enableHardLock();
@@ -435,6 +481,7 @@ public class SystemService extends IntentService {
      * Returns the device LogCat
      */
     public void getLogCat(String command) {
+        Log.d(TAG, "getLogCat");
         try {
             JSONObject commandObj = new JSONObject(command);
             String filePath = Environment.getLegacyExternalStorageDirectory() + "/logcat" + commandObj.getInt("operation_id") + ".log";
@@ -462,6 +509,7 @@ public class SystemService extends IntentService {
      * Inject input to device
      */
     public void injectInput(String command) {
+        Log.d(TAG, "injectInput:" + command);
         float x, y;
         int duration = -1, motionAction = -1;
         String action = null;

@@ -17,10 +17,11 @@
  */
 package org.wso2.iot.agent.services;
 
-import android.app.IntentService;
+// import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -44,8 +45,9 @@ import java.util.Map;
  * to the App catalog application. App catalog can bind to this service and execute permitted operations by
  * sending necessary parameters.
  */
-public class ApplicationManagementService extends IntentService implements APIResultCallBack {
-
+public class ApplicationManagementService extends JobIntentService implements APIResultCallBack {
+    // Unique job ID for this service.
+    private static final int JOB_ID = 104;
     private static final String TAG = ApplicationManagementService.class.getName();
     private static final String INTENT_KEY_PAYLOAD = "payload";
     private static final String INTENT_KEY_STATUS = "status";
@@ -63,11 +65,16 @@ public class ApplicationManagementService extends IntentService implements APIRe
     private Context context;
     private ServerConfig utils;
     public ApplicationManagementService() {
-        super(TAG);
+        super(/*TAG*/);
+    }
+
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, ApplicationManagementService.class, JOB_ID, work);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleWork(Intent intent) {
         Bundle extras = intent.getExtras();
         context = this.getApplicationContext();
         utils = new ServerConfig();

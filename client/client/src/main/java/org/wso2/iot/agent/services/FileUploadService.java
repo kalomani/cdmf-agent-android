@@ -17,12 +17,14 @@
  */
 package org.wso2.iot.agent.services;
 
-import android.app.IntentService;
+//import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.JobIntentService;
 import android.util.Base64;
 import android.util.Log;
 
@@ -62,18 +64,24 @@ import static org.wso2.iot.agent.utils.FileTransferUtils.urlSplitter;
 /**
  * The service which is responsible for uploading files.
  */
-public class FileUploadService extends IntentService {
-
+public class FileUploadService extends JobIntentService {
+    // Unique job ID for this service.
+    private static final int JOB_ID = 105;
     private static final String TAG = FileUploadService.class.getSimpleName();
     private Resources resources;
     SharedPreferences.Editor editor;
 
     public FileUploadService() {
-        super(TAG);
+        super(/*TAG*/);
+    }
+
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, FileUploadService.class, JOB_ID, work);
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleWork(@Nullable Intent intent) {
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Starting File upload service");
         }

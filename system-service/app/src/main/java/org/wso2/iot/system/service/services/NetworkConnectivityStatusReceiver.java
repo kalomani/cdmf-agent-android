@@ -21,7 +21,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Log;
 
 import org.wso2.iot.system.service.R;
@@ -39,20 +41,49 @@ public class NetworkConnectivityStatusReceiver extends BroadcastReceiver {
     private static final String TAG = NetworkConnectivityStatusReceiver.class.getSimpleName();
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onReceive(Context context, Intent intent) {
 
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-        if (wifi.isConnected()) {
-            String status = Preference.getString(context, context.getResources().getString(R.string.upgrade_download_status));
-            if (Constants.Status.WIFI_OFF.equals(status)) {
-                if (Preference.getBoolean(context, context.getResources().getString(R.string.firmware_upgrade_automatic_retry))) {
-                    Log.i(TAG, "Starting firmware download again upon network connectivity established.");
-                    OTADownload otaDownload = new OTADownload(context);
-                    otaDownload.startOTA();
+        NetworkInfo wifi = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // case several network.
+                /*
+                Network list[] = connMgr.getAllNetworks();
+                if (list != null) {
+                    for (Network net : list) {
+                        NetworkInfo netInfo = connMgr.getNetworkInfo(net);
+                        if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                            if (netInfo.isConnected()) {
+                                wifi = netInfo;
+                                break;
+                            }
+                        }
+                    }
+                }*/
+                // case default network
+                wifi = connMgr.getActiveNetworkInfo();
+                if (wifi != null) {
+                    if (wifi.getType() != ConnectivityManager.TYPE_WIFI) {
+                        wifi = null;
+                    }
+                }
+            } else {
+                wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            }
+            if (wifi != null && wifi.isConnected()) {
+                String status = Preference.getString(context, context.getResources().getString(R.string.upgrade_download_status));
+                if (Constants.Status.WIFI_OFF.equals(status)) {
+                    if (Preference.getBoolean(context, context.getResources().getString(R.string.firmware_upgrade_automatic_retry))) {
+                        Log.i(TAG, "Starting firmware download again upon network connectivity established.");
+                        OTADownload otaDownload = new OTADownload(context);
+                        otaDownload.startOTA();
+                    }
                 }
             }
+        } catch (NullPointerException npe) {
+          Log.e(TAG, "Network connectivity status receiver failed: ", npe);
         }
     }
 }

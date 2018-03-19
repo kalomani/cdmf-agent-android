@@ -17,20 +17,29 @@
  */
 package org.wso2.iot.agent.services.kiosk;
 
-import android.app.IntentService;
+// import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 import org.wso2.iot.agent.activities.SplashActivity;
 
-public class KioskUnlockService extends IntentService {
+public class KioskUnlockService extends JobIntentService {
+    // Unique job ID for this service.
+    static final int JOB_ID = 101;
     private static final String TAG = "KioskUnlockService";
 
     public KioskUnlockService() {
-        super(KioskUnlockService.class.getName());
+        super(/*KioskUnlockService.class.getName()*/);
+    }
+
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, KioskUnlockService.class, JOB_ID, work);
     }
 
     @Override
-    protected void onHandleIntent(Intent releaseIntent) {
+    protected void onHandleWork(Intent releaseIntent) {
         Log.d(TAG,"Device unlocked." );
         releaseIntent = new Intent(this, SplashActivity.class);
         releaseIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

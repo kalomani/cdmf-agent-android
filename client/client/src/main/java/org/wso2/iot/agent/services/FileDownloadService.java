@@ -17,13 +17,15 @@
  */
 package org.wso2.iot.agent.services;
 
-import android.app.IntentService;
+// import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
 import com.jcraft.jsch.Channel;
@@ -63,20 +65,25 @@ import static org.wso2.iot.agent.utils.FileTransferUtils.cleanupStreams;
 /**
  * Service to download files.
  */
-public class FileDownloadService extends IntentService {
-
+public class FileDownloadService extends JobIntentService {
+    // Unique job ID for this service.
+    private static final int JOB_ID = 107;
     private static final String TAG = FileDownloadService.class.getSimpleName();
     private Resources resources;
     private SharedPreferences.Editor editor;
 
     public FileDownloadService() {
-        super(TAG);
+        super(/*TAG*/);
     }
 
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, FileDownloadService.class, JOB_ID, work);
+    }
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleWork(@Nullable Intent intent) {
         if (Constants.DEBUG_MODE_ENABLED) {
-            Log.d(TAG, "Starting File upload service");
+            Log.d(TAG, "Starting File download service");
         }
         resources = getResources();
         editor = PreferenceManager.getDefaultSharedPreferences(this).edit();

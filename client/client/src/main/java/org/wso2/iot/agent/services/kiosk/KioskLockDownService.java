@@ -17,21 +17,32 @@
  */
 package org.wso2.iot.agent.services.kiosk;
 
-import android.app.IntentService;
+// import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.JobIntentService;
+
 import org.wso2.iot.agent.activities.KioskRestrictionActivity;
 
 /**
  * This class connects the LockActivity to the intent that is get passed in.
  */
-public class KioskLockDownService extends IntentService {
+public class KioskLockDownService extends JobIntentService {
+    // Unique job ID for this service.
+    private static final int JOB_ID = 100;
 
     public KioskLockDownService() {
-        super(KioskLockDownService.class.getName());
+        super(/*KioskLockDownService.class.getName()*/);
     }
 
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, KioskLockDownService.class, JOB_ID, work);
+    }
+
+
     @Override
-    protected void onHandleIntent(Intent lockIntent) {
+    protected void onHandleWork(Intent lockIntent) {
         lockIntent = new Intent(this, KioskRestrictionActivity.class);
         lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(lockIntent);

@@ -103,7 +103,13 @@ public class DeviceInfoPayload {
 
         if (!CommonUtils.isServiceRunning(context, NetworkInfoService.class)) {
             Intent serviceIntent = new Intent(context, NetworkInfoService.class);
-            context.startService(serviceIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Log.d(TAG, "startForegroundService for NetworkInfoService");
+                context.startForegroundService(serviceIntent);
+            } else {
+                Log.d(TAG, "startService for NetworkInfoService");
+                context.startService(serviceIntent);
+            }
         }
 
         Location deviceLocation = CommonUtils.getLocation(context);

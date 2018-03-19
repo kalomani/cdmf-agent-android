@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.getIntent;
 
 public class OperationManagerCOSU extends OperationManager {
     private static final String TAG = OperationManagerCOSU.class.getSimpleName();
@@ -667,7 +668,7 @@ public class OperationManagerCOSU extends OperationManager {
                 Preference.putBoolean(getContext(),
                         Constants.PreferenceCOSUProfile.ENABLE_LOCKDOWN, true);
                 KioskAlarmReceiver kioskAlarmReceiver = new KioskAlarmReceiver();
-                kioskAlarmReceiver.startAlarm(getContext());
+                kioskAlarmReceiver.startAlarm(getContext(), new Intent(getContext(), OperationManagerCOSU.class));
             }
             operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
             getResultBuilder().build(operation);
@@ -722,7 +723,11 @@ public class OperationManagerCOSU extends OperationManager {
         resultBuilder.build(operation);
         Intent msgIntent = new Intent(context, KioskMsgAlarmService.class);
         msgIntent.putExtra(KioskMsgAlarmService.ACTIVITY_TYPE, Constants.Operation.DEVICE_RING);
-        context.startService(msgIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            KioskMsgAlarmService.enqueueWork(context, msgIntent);
+        } else {
+            context.startService(msgIntent);
+        }
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Ringing is activated on the device");
         }
@@ -745,7 +750,11 @@ public class OperationManagerCOSU extends OperationManager {
                 msgIntent.putExtra(KioskMsgAlarmService.ACTIVITY_TYPE, Constants.Operation.NOTIFICATION);
                 msgIntent.putExtra(KioskMsgAlarmService.ACTIVITY_TITLE, messageTitle);
                 msgIntent.putExtra(KioskMsgAlarmService.ACTIVITY_MSG, messageText);
-                context.startService(msgIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    KioskMsgAlarmService.enqueueWork(context, msgIntent);
+                } else {
+                    context.startService(msgIntent);
+                }
             } else {
                 operation.setStatus(getContextResources().getString(R.string.operation_value_error));
                 String errorMessage = "Message title/text is empty. Please retry with valid inputs";

@@ -17,6 +17,7 @@
  */
 package org.wso2.iot.agent.services.operation;
 
+import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
@@ -32,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -394,7 +396,11 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
         operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
         Intent upload = new Intent(context, FileUploadService.class);
         upload.putExtra(resources.getString(R.string.intent_extra_operation_object), operation);
-        context.startService(upload);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            FileUploadService.enqueueWork(context, upload);
+        } else {
+            context.startService(upload);
+        }
     }
 
     /**
@@ -407,7 +413,11 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
         operation.setStatus(resources.getString(R.string.operation_value_progress));
         Intent upload = new Intent(context, FileDownloadService.class);
         upload.putExtra(resources.getString(R.string.intent_extra_operation_object), operation);
-        context.startService(upload);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            FileDownloadService.enqueueWork(context, upload);
+        } else {
+            context.startService(upload);
+        }
     }
 
     /**
@@ -1187,6 +1197,7 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @throws TransportHandlerException - Throws when session connection has an error
      * @throws JSONException             - Throws when error occurs while parsing the payload
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void screenCapture(org.wso2.iot.agent.beans.Operation operation) throws TransportHandlerException,
             JSONException {
         String action;
@@ -1221,7 +1232,11 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
                                         .putExtra(ScreenSharingService.EXTRA_RESULT_CODE, -1)
                                         .putExtra(Constants.MAX_WIDTH, maxWidth)
                                         .putExtra(Constants.MAX_HEIGHT, maxHeight);
-                        context.startService(i);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            context.startForegroundService(i);
+                        } else {
+                            context.startService(i);
+                        }
                     } else {
                         Intent intent = new Intent(context, ScreenShareActivity.class)
                                 .putExtra(Constants.MAX_WIDTH, maxWidth)
@@ -1255,10 +1270,18 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      */
     public void processInputInject(org.wso2.iot.agent.beans.Operation operation) throws TransportHandlerException,
             JSONException {
-        if (Constants.SYSTEM_APP_ENABLED && ScreenSharingService.isScreenShared) {
-            if (operation.getPayLoad() != null) {
-                CommonUtils.callSystemApp(context, Constants.Operation.REMOTE_INPUT, operation.getPayLoad().toString(),
-                        null);
+        if (Constants.SYSTEM_APP_ENABLED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (ScreenSharingService.isScreenShared) {
+                    if (operation.getPayLoad() != null) {
+                        CommonUtils.callSystemApp(context, Constants.Operation.REMOTE_INPUT, operation.getPayLoad().toString(),
+                                null);
+                    }
+                } else {
+                    operation.setStatus("ERROR");
+                    operation.setOperationResponse("Remote Input does not support");
+                    WebSocketSessionHandler.getInstance(context).sendMessage(operation);
+                }
             }
         } else {
             operation.setStatus("ERROR");

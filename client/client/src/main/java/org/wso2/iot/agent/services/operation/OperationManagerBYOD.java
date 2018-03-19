@@ -19,6 +19,7 @@
 package org.wso2.iot.agent.services.operation;
 
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
@@ -56,6 +57,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import static android.security.KeyStore.getApplicationContext;
+
 public class OperationManagerBYOD extends OperationManager {
 
     private static final String TAG = OperationManagerBYOD.class.getSimpleName();
@@ -91,13 +94,22 @@ public class OperationManagerBYOD extends OperationManager {
                 PendingIntent requestPermission = PendingIntent.getBroadcast(context, 0, uploadIntent,
                         PendingIntent.FLAG_CANCEL_CURRENT);
 
+
                 Intent cancelIntent = new Intent(context, FileUploadCancelReceiver.class);
                 cancelIntent.putExtra(getContextResources().getString(R.string.intent_extra_operation_object), operation);
 
                 PendingIntent cancel = PendingIntent.getBroadcast(context, 0, cancelIntent,
                         PendingIntent.FLAG_CANCEL_CURRENT);
-
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+                NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationCompat.Builder mBuilder = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                    NotificationChannel notificationChannel = new NotificationChannel("ID", "Name", importance);
+                    manager.createNotificationChannel(notificationChannel);
+                    mBuilder = new NotificationCompat.Builder(context.getApplicationContext(), notificationChannel.getId());
+                } else {
+                    mBuilder = new NotificationCompat.Builder(context.getApplicationContext());
+                }
                 mBuilder
                         .setSmallIcon(android.R.drawable.ic_menu_upload)
                         .setContentTitle(selectedFile.getName() + getContextResources().getString(R.
@@ -110,7 +122,6 @@ public class OperationManagerBYOD extends OperationManager {
                         .addAction(android.R.drawable.ic_menu_close_clear_cancel, getContextResources().
                                 getString(R.string.NOTIFICATION_CANCEL), cancel);
 
-                NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.notify(operation.getId(), mBuilder.build());
             } else {
                 operation.setStatus(getContextResources().getString(R.string.
@@ -118,7 +129,7 @@ public class OperationManagerBYOD extends OperationManager {
                 operation.setOperationResponse("Requested file does not exists in device.");
                 setResponse(operation);
             }
-        } catch (JSONException e) {
+        } catch (JSONException | NullPointerException e) {
             operation.setStatus(getContextResources().getString(R.string.
                     operation_value_error));
             operation.setOperationResponse("Error in operation payload");
@@ -551,7 +562,11 @@ public class OperationManagerBYOD extends OperationManager {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                             Constants.APP_MONITOR_FREQUENCY, pendingIntent);
                 }
-                getContext().startService(restrictionIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    AppLockService.enqueueWork(getContext(), restrictionIntent);
+                } else {
+                    getContext().startService(restrictionIntent);
+                }
             } else if (Constants.OWNERSHIP_COPE.equals(ownershipType)) {
                 for (String packageName : appRestriction.getRestrictedList()) {
                     CommonUtils.callSystemApp(getContext(), operation.getCode(), "false", packageName);

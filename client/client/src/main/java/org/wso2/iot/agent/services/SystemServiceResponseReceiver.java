@@ -40,6 +40,7 @@ public class SystemServiceResponseReceiver extends BroadcastReceiver {
         String code = intent.getStringExtra("code");
         String status = intent.getStringExtra("status");
         JSONObject result;
+        Log.d(TAG, String.format("operation: {} ; code: {} ; status: {}", operation, code, status));
         try {
             switch (operation) {
                 case Constants.Operation.GET_FIRMWARE_BUILD_DATE:

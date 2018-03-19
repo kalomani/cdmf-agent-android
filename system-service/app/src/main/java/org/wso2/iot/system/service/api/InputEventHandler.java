@@ -19,6 +19,7 @@
 package org.wso2.iot.system.service.api;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
@@ -156,12 +157,22 @@ public class InputEventHandler {
             // }
         }
 
-        if (!powerManager.isScreenOn()) {
-            PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK |
-                    PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
-            TempWakeLock.acquire();
-            TempWakeLock.release();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (!powerManager.isInteractive()) {
+                PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK |
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
+                TempWakeLock.acquire();
+                TempWakeLock.release();
+            }
+        } else {
+            if (!powerManager.isScreenOn()) {
+                PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK |
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
+                TempWakeLock.acquire();
+                TempWakeLock.release();
+            }
         }
+
         if (duration <= 0) {
             duration = Constants.MIN_DURATION;
         }

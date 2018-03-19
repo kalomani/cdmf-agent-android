@@ -18,7 +18,10 @@
 
 package org.wso2.iot.agent.services.location;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -29,6 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -175,11 +179,34 @@ public class LocationService extends Service implements LocationListener {
         publishLocationInfo(location);
     }
 
+    protected void foreground() {
+        // launch service in foreground
+        int id = 11120;
+        Log.i(TAG, "launch service in foreground");
+        NotificationCompat.Builder mBuilder = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel("" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
+            }
+            mBuilder.setContentText(TAG).setAutoCancel(true);
+            startForeground(id,  mBuilder.build());
+        } catch (NullPointerException npe) {
+            Log.e(TAG,"failed to start on foreground ", npe);
+        }
+    }
+
     @Override
     public void onCreate() {
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Creating service");
         }
+        foreground();
         if (isPlayServicesAvailable()) {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         } else {

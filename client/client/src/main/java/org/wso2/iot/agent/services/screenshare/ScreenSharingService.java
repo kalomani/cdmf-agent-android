@@ -18,7 +18,10 @@
 
 package org.wso2.iot.agent.services.screenshare;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -38,6 +41,7 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -77,12 +81,35 @@ public class ScreenSharingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        foreground();
         IBinder b = ServiceManager.getService(MEDIA_PROJECTION_SERVICE);
         mService = IMediaProjectionManager.Stub.asInterface(b);
         mgr = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         wmgr = (WindowManager) getSystemService(WINDOW_SERVICE);
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
+    }
+
+    protected void foreground() {
+        // launch service in foreground
+        int id = 11110;
+        Log.i(TAG, "launch service in foreground");
+        NotificationCompat.Builder mBuilder = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel( "" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
+            }
+            mBuilder.setContentText(TAG).setAutoCancel(true);
+            startForeground(id,  mBuilder.build());
+        } catch (NullPointerException npe) {
+            Log.e(TAG,"failed to start on foreground ", npe);
+        }
     }
 
     @Override

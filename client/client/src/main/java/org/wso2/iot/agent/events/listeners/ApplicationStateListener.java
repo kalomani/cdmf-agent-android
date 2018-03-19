@@ -217,7 +217,12 @@ public class ApplicationStateListener extends BroadcastReceiver implements Alert
                                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                                         Constants.APP_MONITOR_FREQUENCY, pendingIntent);
                             }
-                            context.startService(restrictionIntent);
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                AppLockService.enqueueWork(context, restrictionIntent);
+                            } else {
+                                context.startService(restrictionIntent);
+                            }
                         }
                     } else if (Constants.SYSTEM_APP_ENABLED) {
                         CommonUtils.callSystemApp(context,

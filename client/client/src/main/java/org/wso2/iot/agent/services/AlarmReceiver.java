@@ -27,6 +27,7 @@ import org.wso2.iot.agent.utils.Constants;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 /**
@@ -47,14 +48,24 @@ public class AlarmReceiver extends BroadcastReceiver {
 			ApplicationManager applicationManager = new ApplicationManager(context.getApplicationContext());
 			if(operationCode != null && operationCode.trim().equals(Constants.Operation.INSTALL_APPLICATION)) {
 				String appUrl = intent.getStringExtra(context.getResources().getString(R.string.app_url));
-				Operation operation = null;
-				if (intent.hasExtra(context.getResources().getString(R.string.alarm_scheduled_operation_payload)))				{
-					operation = (Operation) intent.getExtra(context.getResources().getString(R.string.alarm_scheduled_operation_payload));
+				if (intent.hasExtra(context.getResources().getString(R.string.alarm_scheduled_operation_payload))) {
+					try {
+						// Commented because getExtra is deprecated.
+						// Operation operation = (Operation) intent.getExtra(context.getResources().getString(R.string.alarm_scheduled_operation_payload));
+						Bundle bundle = intent.getExtras();
+						Operation operation = (Operation) bundle.get(context.getResources().getString(R.string.alarm_scheduled_operation_payload));
+						if (operation != null) {
+                            Log.i(TAG, " check operation install: " + operation);
+                            applicationManager.installApp(appUrl, null, operation);
+                        }
+					} catch (NullPointerException npe) {
+						Log.e(TAG, "get alarm scheduled operation payload", npe);
+					}
 				}
-				applicationManager.installApp(appUrl, null, operation);
 			} else if(operationCode != null && operationCode.trim().equals(Constants.Operation.UNINSTALL_APPLICATION)) {
 				String packageUri = intent.getStringExtra(context.getResources().getString(R.string.app_uri));
 				try {
+                    Log.i(TAG, " check operation uninstall");
 					applicationManager.uninstallApplication(packageUri, null);
 				} catch (AndroidAgentException e) {
 					Log.e(TAG,"App uninstallation failed");
@@ -63,6 +74,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 		} else {
 			OperationTask operationTask = new OperationTask();
+            Log.i(TAG, " check operation task: ");
 			operationTask.execute(context);
 		}
 

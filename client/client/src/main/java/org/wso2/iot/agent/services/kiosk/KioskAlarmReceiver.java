@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.JobIntentService;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -38,29 +39,42 @@ import java.util.Calendar;
  * This class handles generating alarms to lock and unlock device to adhere with restriction of
  * operation time.
  */
-public class KioskAlarmReceiver extends WakefulBroadcastReceiver{
+public class KioskAlarmReceiver extends JobIntentService {
     private String TAG = KioskAlarmReceiver.class.getSimpleName();
+    // Unique job ID for this service.
+    private static final int JOB_ID = 99;
+
+    public KioskAlarmReceiver() {
+        super();
+    }
+
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, KioskAlarmReceiver.class, JOB_ID, work);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public void onReceive(Context context, Intent intent) {
-        Intent service;
+    public void onHandleWork(Intent intent) {
+        //Intent service;
+        Context context = this.getApplicationContext();
         Activity currentlyLockedActivity;
         if (intent.getBooleanExtra(Constants.Operation.ENABLE_LOCK, false)){
             Log.d(TAG,"OnReceive EnableLock false." );
             currentlyLockedActivity = new KioskActivity();
             currentlyLockedActivity.stopLockTask();
-            service = new Intent(context, KioskLockDownService.class);
+            //service = new Intent(this, KioskLockDownService.class);
             buildAlarm(context, false, false);
-            startWakefulService(context, service);
+            // startWakefulService(context, service);
+            KioskLockDownService.enqueueWork(context, intent);
         }
         else if (!intent.getBooleanExtra(Constants.Operation.ENABLE_LOCK, true)){
             Log.d(TAG,"OnReceive enableLock true" );
             currentlyLockedActivity = new KioskRestrictionActivity();
             currentlyLockedActivity.stopLockTask();
-            service = new Intent(context, KioskUnlockService.class);
+            //service = new Intent(context, KioskUnlockService.class);
             buildAlarm(context, true, false);
-            startWakefulService(context, service);
+            //startWakefulService(context, service);
+            KioskUnlockService.enqueueWork(context, intent);
         }
     }
 
@@ -69,7 +83,8 @@ public class KioskAlarmReceiver extends WakefulBroadcastReceiver{
      * @param context Context of the application.
      */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void startAlarm(Context context){
+    public void startAlarm(Context context, Intent intent){
+        enqueueWork(context, intent);
         buildAlarm(context, true, true);
         Log.d(TAG,"Starting Alarm with initial Lock operation" );
     }

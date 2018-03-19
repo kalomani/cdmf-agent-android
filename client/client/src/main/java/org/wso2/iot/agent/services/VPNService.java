@@ -17,12 +17,16 @@
  */
 package org.wso2.iot.agent.services;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 import org.wso2.iot.agent.AlertActivity;
@@ -63,6 +67,34 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
     private ParcelFileDescriptor fileDescriptor;
     private String vpnParameters;
     private PendingIntent configureIntent;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        foreground();
+    }
+
+    protected void foreground() {
+        // launch service in foreground
+        int id = 11130;
+        Log.i(TAG, "launch service in foreground");
+        NotificationCompat.Builder mBuilder = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel( "" + id, TAG, importance);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext(), notificationChannel.getId());
+            } else {
+                mBuilder = new NotificationCompat.Builder(this.getApplicationContext());
+            }
+            mBuilder.setContentText(TAG).setAutoCancel(true);
+            startForeground(id,  mBuilder.build());
+        } catch (NullPointerException npe) {
+            Log.e(TAG,"failed to start on foreground ", npe);
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

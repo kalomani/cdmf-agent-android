@@ -21,6 +21,7 @@ package org.wso2.iot.system.service;
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.UserHandle;
 import android.util.Log;
 
 public class ServiceDeviceAdminReceiver extends DeviceAdminReceiver {
@@ -46,9 +47,9 @@ public class ServiceDeviceAdminReceiver extends DeviceAdminReceiver {
     }
 
     @Override
-    public void onPasswordChanged(Context context, Intent intent) {
+    public void onPasswordChanged(Context context, Intent intent, UserHandle userHandle) {
         // TODO Auto-generated method stub
-        super.onPasswordChanged(context, intent);
+        super.onPasswordChanged(context, intent, userHandle);
         Log.i("Device Admin", "Password Changed");
     }
 }

@@ -41,13 +41,20 @@ public class WorkProfileManager extends Activity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @SuppressWarnings("deprecation")
     private void provisionManagedProfile() {
         Activity activity = this;
         Intent intent =
                 new Intent(android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE);
-        intent.putExtra(android.app.admin.
-                        DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME,
-                activity.getApplicationContext().getPackageName());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            intent.putExtra(android.app.admin.
+                            DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
+                    activity.getApplicationContext().getPackageName());
+        } else {
+            intent.putExtra(android.app.admin.
+                            DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_PACKAGE_NAME,
+                    activity.getApplicationContext().getPackageName());
+        }
         // Once the provisioning is done, user is prompted to uninstall the agent in personal profile.
         ApplicationManager applicationManager = new ApplicationManager(this.getApplicationContext());
         try {

@@ -20,6 +20,7 @@ package org.wso2.iot.agent.services;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 import org.wso2.iot.agent.utils.CommonUtils;
 import org.wso2.iot.agent.utils.Constants;
@@ -39,7 +40,11 @@ public class NetworkConnectedReceiver extends BroadcastReceiver {
                     Intent autoEnrollIntent = new Intent(context, EnrollmentService.class);
                     autoEnrollIntent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                     autoEnrollIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startServiceAsUser(autoEnrollIntent, android.os.Process.myUserHandle());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundServiceAsUser(autoEnrollIntent, android.os.Process.myUserHandle());
+                    } else {
+                        context.startServiceAsUser(autoEnrollIntent, android.os.Process.myUserHandle());
+                    }
                 }
                 CommonUtils.callSystemAppInit(context);
             }

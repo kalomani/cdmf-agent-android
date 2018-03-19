@@ -20,14 +20,23 @@ package org.wso2.iot.system.service.utils;
 import android.app.PackageInstallObserver;
 import android.content.Context;
 import android.content.pm.IPackageDeleteObserver;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static android.content.pm.PackageManager.*;
 
@@ -196,8 +205,33 @@ public class AppUtils {
                 }
             }
         };
-        pm.installPackage(packageUri, observer, INSTALL_ALL_USERS | INSTALL_ALLOW_DOWNGRADE |
-                                           INSTALL_REPLACE_EXISTING, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                InputStream in = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/Download/update.apk");
+                PackageInstaller pi = pm.getPackageInstaller();
+                PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
+                        PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+                params.setAppPackageName(packageUri.getPath());
+                int sessionId = pi.createSession(params);
+                PackageInstaller.Session session = pi.openSession(sessionId);
+                OutputStream out = session.openWrite("COSU", 0, -1);
+                byte[] buffer = new byte[65536];
+                int c;
+                while ((c = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, c);
+                }
+                session.fsync(out);
+                in.close();
+                out.close();
+            } catch (FileNotFoundException fne) {
+                Log.e(TAG, "install failed", fne);
+            } catch (IOException ioe) {
+                Log.e(TAG, "install failed", ioe);
+            }
+        } else {
+            pm.installPackage(packageUri, observer, INSTALL_ALL_USERS | INSTALL_ALLOW_DOWNGRADE |
+                    INSTALL_REPLACE_EXISTING, null);
+        }
     }
 
     /**

@@ -18,10 +18,11 @@
 package org.wso2.iot.agent.services;
 
 import android.app.ActivityManager;
-import android.app.IntentService;
+// import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
 import org.wso2.iot.agent.AppLockActivity;
@@ -29,19 +30,25 @@ import org.wso2.iot.agent.utils.Constants;
 
 import java.util.List;
 
-public class AppLockService extends IntentService {
-
+public class AppLockService extends JobIntentService {
+    // Unique job ID for this service.
+    private static final int JOB_ID = 103;
 	private static final String TAG = "AppLockService";
 	private Context context;
 
 	public AppLockService() {
-		super(AppLockService.class.getName());
+		super(/*AppLockService.class.getName()*/);
 		context = AppLockService.this;
 
 	}
 
+    // Convenience method for enqueuing work in to this service.
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, AppLockService.class, JOB_ID, work);
+    }
+
 	@Override
-	protected void onHandleIntent(Intent lockIntent) {
+	protected void onHandleWork(Intent lockIntent) {
 		Log.d(TAG, "Service started...!");
 
 		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -54,25 +61,34 @@ public class AppLockService extends IntentService {
 		lockIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |
 		                    Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			String[] activePackages = am.getRunningAppProcesses().get(0).pkgList;
-			for (int i = 0; i < activePackages.length ; i++) {
-				for (String app : appList) {
-					if (app.equals(activePackages[i])) {
-						startActivity(lockIntent);
-					}
-				}
-			}
-		}
-		else {
-			// The first in the list of RunningTasks is always the foreground task.
-			ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
-			String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
-			for (String app : appList) {
-				if (app.equals(foregroundTaskPackageName)) {
-					startActivity(lockIntent);
-				}
-			}
-		}
+		try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                List<ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
+                if (list != null) {
+                    String[] activePackages = list.get(0).pkgList;
+                    for (int i = 0; i < activePackages.length; i++) {
+                        for (String app : appList) {
+                            if (app.equals(activePackages[i])) {
+                                startActivity(lockIntent);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // The first in the list of RunningTasks is always the foreground task.
+                List<ActivityManager.RunningTaskInfo> list = am.getRunningTasks(1);
+                if (list != null) {
+                    ActivityManager.RunningTaskInfo foregroundTaskInfo = list.get(0);
+                    String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
+                    for (String app : appList) {
+                        if (app.equals(foregroundTaskPackageName)) {
+                            startActivity(lockIntent);
+                        }
+                    }
+                }
+            }
+        } catch (NullPointerException npe) {
+            Log.e(TAG, "Failed to get running tasks", npe);
+        }
 	}
 }

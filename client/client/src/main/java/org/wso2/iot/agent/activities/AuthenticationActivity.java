@@ -483,7 +483,7 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 				devicePolicyManager.isProfileOwnerApp(getPackageName())) {
 			checkManifestPermissions();
 			CommonUtils.callSystemApp(context, null, null, null);
-			Log.i("onActivityResult", "Administration enabled!");
+			Log.i("startDeviceAdminPrompt", "Administration enabled!");
 		} else {
 			DevicePolicyManager devicePolicyManager = (DevicePolicyManager)
 					getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -668,56 +668,56 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	private void getLicense() {
-		boolean isAgreed = Preference.getBoolean(context, Constants.PreferenceFlag.IS_AGREED);
-		deviceType = Preference.getString(context, Constants.DEVICE_TYPE);
+        boolean isAgreed = Preference.getBoolean(context, Constants.PreferenceFlag.IS_AGREED);
+        deviceType = Preference.getString(context, Constants.DEVICE_TYPE);
 
-		if(deviceType == null) {
-			deviceType = Constants.DEFAULT_OWNERSHIP;
-			Preference.putString(context, Constants.DEVICE_TYPE,
-					deviceType);
-		}
+        if (deviceType == null) {
+            deviceType = Constants.DEFAULT_OWNERSHIP;
+            Preference.putString(context, Constants.DEVICE_TYPE,
+                    deviceType);
+        }
 
-		if (deviceType != null && Constants.OWNERSHIP_BYOD.equals(deviceType.trim())) {
+        if (deviceType != null && (Constants.OWNERSHIP_BYOD.equals(deviceType.trim()) || Constants.OWNERSHIP_COPE.equals(deviceType.trim()))) {
+        //if (deviceType != null && Constants.OWNERSHIP_BYOD.equals(deviceType.trim())) {
 
-			if (!isAgreed) {
-				final OnCancelListener cancelListener = new OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface arg0) {
-						CommonDialogUtils.getAlertDialogWithOneButtonAndTitle(context,
-								getResources().getString(R.string.error_enrollment_failed_detail),
-								getResources().getString(R.string.error_enrollment_failed),
-								getResources().getString(R.string.button_ok), null);
-					}
-				};
+            if (!isAgreed) {
+                final OnCancelListener cancelListener = new OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface arg0) {
+                        CommonDialogUtils.getAlertDialogWithOneButtonAndTitle(context,
+                                getResources().getString(R.string.error_enrollment_failed_detail),
+                                getResources().getString(R.string.error_enrollment_failed),
+                                getResources().getString(R.string.button_ok), null);
+                    }
+                };
 
-				AuthenticationActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						progressDialog = CommonDialogUtils.showProgressDialog(context,
-								getResources().getString(
-										R.string.dialog_license_agreement),
-								getResources().getString(
-										R.string.dialog_please_wait),
-								cancelListener);
-					}
-				});
+                AuthenticationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog = CommonDialogUtils.showProgressDialog(context,
+                                getResources().getString(
+                                        R.string.dialog_license_agreement),
+                                getResources().getString(
+                                        R.string.dialog_please_wait),
+                                cancelListener);
+                    }
+                });
 
-				// Check network connection availability before calling the API.
-				if (CommonUtils.isNetworkAvailable(context)) {
-					getLicenseFromServer();
-				} else {
-					CommonDialogUtils.stopProgressDialog(progressDialog);
-					CommonDialogUtils.showNetworkUnavailableMessage(context);
-				}
+                // Check network connection availability before calling the API.
+                if (CommonUtils.isNetworkAvailable(context)) {
+                    getLicenseFromServer();
+                } else {
+                    CommonDialogUtils.stopProgressDialog(progressDialog);
+                    CommonDialogUtils.showNetworkUnavailableMessage(context);
+                }
 
-			} else {
-				startDeviceAdminPrompt();
-			}
-		} else if (deviceType != null){
-			checkManifestPermissions();
-		}
-
-	}
+            } else {
+                startDeviceAdminPrompt();
+            }
+        } else if (deviceType != null) {
+            checkManifestPermissions();
+        }
+    }
 
 	/**
 	 * Retriever license agreement details from the server.
@@ -980,7 +980,11 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 		if(proceedNext) {
 			if (!CommonUtils.isServiceRunning(context, LocationService.class)){
 				Intent serviceIntent = new Intent(context, LocationService.class);
-				context.startService(serviceIntent);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+					context.startForegroundService(serviceIntent);
+				} else {
+					context.startService(serviceIntent);
+				}
 			}
 			loadNextActivity();
 		}
