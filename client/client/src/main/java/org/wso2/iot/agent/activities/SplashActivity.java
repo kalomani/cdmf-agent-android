@@ -52,6 +52,9 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
         setContentView(R.layout.activity_splash);
         if (Constants.AUTO_ENROLLMENT_BACKGROUND_SERVICE_ENABLED) {
             Intent intent = new Intent(this, EnrollmentService.class);
@@ -87,6 +90,9 @@ public class SplashActivity extends Activity {
     }
 
     private void startActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startActivity");
+        }
         if (Constants.OWNERSHIP_COSU.equals(Constants.DEFAULT_OWNERSHIP)) {
             instantiatedActivityClass = KioskActivity.class;
         } else if (Preference.getBoolean(this, Constants.PreferenceFlag.DEVICE_ACTIVE)) {
@@ -110,6 +116,9 @@ public class SplashActivity extends Activity {
      * Check capability to have a separate managed profile.
      */
     private boolean hasWorkProfileCapability() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "hasWorkProfileCapability");
+        }
         DeviceState state = new DeviceState(this);
         Response androidForWorkCompatibility = state.evaluateAndroidForWorkCompatibility();
         return androidForWorkCompatibility.getCode();

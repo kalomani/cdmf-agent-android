@@ -76,7 +76,7 @@ import java.util.TimerTask;
  */
 public class AlreadyRegisteredActivity extends AppCompatActivity implements APIResultCallBack {
 
-	private static final String TAG = AlreadyRegisteredActivity.class.getSimpleName();
+	private static final String TAG = AlreadyRegisteredActivity.class.getName();
 	private static final int ACTIVATION_REQUEST = 47;
 	private static final int DELAY_TIME = 0;
 	private static final int PERIOD_TIME = 60 * 1000;
@@ -102,7 +102,11 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onCreate");
+		}
+
 		setContentView(R.layout.activity_already_registered);
 
 		textViewLastSync = (TextView) findViewById(R.id.textViewLastSync);
@@ -298,6 +302,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 
 	@Override
 	protected void onDestroy(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onDestroy");
+        }
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 		super.onDestroy();
 		if (progressDialog != null && progressDialog.isShowing()) {
@@ -308,6 +315,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onRequestPermissionResult");
+        }
 		if (requestCode == 110) {
 			List<String> missingPermissions = new ArrayList<>();
 			for (int i =0;  i < permissions.length; i++) {
@@ -324,6 +334,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	}
 
 	private void startEvents() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startEvents");
+        }
 		if(!EventRegistry.eventListeningStarted) {
 			EventRegistry registerEvent = new EventRegistry(this);
 			registerEvent.register();
@@ -351,6 +364,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Send unregistration request.
 	 */
 	private void startUnRegistration() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startUnRegistration");
+        }
 		progressDialog = ProgressDialog.show(context,
 						getResources().getString(R.string.dialog_message_unregistering),
 						getResources().getString(R.string.dialog_message_please_wait),
@@ -396,12 +412,18 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public void onBackPressed() {
-		loadHomeScreen();
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onBackPressed");
+        }
+	    loadHomeScreen();
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onKeyDown");
+        }
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			loadHomeScreen();
 			return true;
@@ -416,7 +438,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onResume");
+        }
 		if (Constants.DEBUG_MODE_ENABLED) {
 			Log.d(TAG, "Calling onResume");
 		}
@@ -457,11 +481,17 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	@Override
 	protected void onPause() {
 		super.onPause();
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onPause");
+        }
 		unregisterReceiver(syncUpdateReceiver);
 		mTimer.cancel();
 	}
 
 	private void updateSyncText() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "updateSyncTest");
+        }
 		String syncText = CommonUtils.getTimeAgo(lastSyncMillis, context);
 		if (syncText == null) {
 			syncText = getResources().getString(R.string.txt_never);
@@ -475,6 +505,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Displays an internal server error message to the user.
 	 */
 	private void displayInternalServerError() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "displayInternalServerError");
+        }
 		AlertDialog.Builder alertDialog = CommonDialogUtils.getAlertDialogWithOneButtonAndTitle(context,
 				getResources().getString(R.string.title_head_connection_error),
 				getResources().getString(R.string.error_internal_server),
@@ -537,6 +570,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	private void loadHomeScreen() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadHomeScreen");
+        }
 		if(!devicePolicyManager.isProfileOwnerApp(getPackageName())) {
 			finish();
 			Intent i = new Intent();
@@ -554,6 +590,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Initiate unregistration.
 	 */
 	private void initiateUnregistration() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "initiateUnregistration");
+        }
 		CommonUtils.disableAdmin(context);
 		Preference.putBoolean(context, Constants.PreferenceFlag.REGISTERED, false);
 		loadInitialActivity();
@@ -563,6 +602,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Display unregistration confirmation dialog.
 	 */
 	private void showUnregisterDialog() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showUnregisterDialog");
+        }
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		} else {
@@ -582,6 +624,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Load device info activity.
 	 */
 	private void loadDeviceInfoActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadDeviceInfoActivity");
+        }
 		Intent intent =
 				new Intent(AlreadyRegisteredActivity.this,
 						DisplayDeviceInfoActivity.class);
@@ -594,6 +639,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Load initial activity.
 	 */
 	private void loadInitialActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadInitialActivity");
+        }
 		Preference.clearPreferences(this);
 		Intent intent = new Intent( AlreadyRegisteredActivity.this, SplashActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -605,6 +653,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Load PIN code activity.
 	 */
 	private void loadPinCodeActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadPinCodeActivity");
+        }
 		Intent intent =
 				new Intent(AlreadyRegisteredActivity.this, PinCodeActivity.class);
 		intent.putExtra(getResources().getString(R.string.intent_extra_from_activity),
@@ -616,6 +667,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Loads authentication error activity.
 	 */
 	private void loadAuthenticationErrorActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadAuthenticationErrorActivity");
+        }
 		Intent intent =
 				new Intent(AlreadyRegisteredActivity.this,
 						AuthenticationErrorActivity.class);
@@ -629,18 +683,27 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
 	 * Stops server polling task.
 	 */
 	private void stopPolling() {
-		LocalNotification.stopPolling(context);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "stopPolling");
+        }
+        LocalNotification.stopPolling(context);
 	}
 
 	/**
 	 * Starts server polling task.
 	 */
 	private void startPolling() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startPolling");
+        }
 		LocalNotification.startPolling(context);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onActivityResult");
+        }
         Log.d(TAG, "onActivityResult; requestCode " + requestCode + "result code" + resultCode);
         if (requestCode == ACTIVATION_REQUEST) {
 			if (resultCode == AppCompatActivity.RESULT_OK) {
@@ -655,7 +718,9 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
         }
 	}
     private void syncWithServer() {
-	    Log.d(TAG, "Sync with Server");
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "syncWithServer");
+        }
         Animation rotate = AnimationUtils.loadAnimation(context, R.anim.clockwise_refresh);
         imageViewRefresh.startAnimation(rotate);
         textViewLastSync.setText(R.string.txt_sync);
@@ -669,7 +734,10 @@ public class AlreadyRegisteredActivity extends AppCompatActivity implements APIR
     }
 
 	private boolean isDeviceAdminActive() {
-		return devicePolicyManager.isAdminActive(cdmDeviceAdmin);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "isDeviceAdminActive");
+        }
+	    return devicePolicyManager.isAdminActive(cdmDeviceAdmin);
 	}
 
 }

@@ -34,17 +34,23 @@ import java.net.URL;
  */
 public class OTAServerConfig {
 
-    private static final String TAG = "OTA_SC";
+    private static final String TAG = OTAServerConfig.class.getName();
     private URL updatePackageURL;
     private URL buildPropURL;
     private Context context;
 
     public OTAServerConfig(String productName, Context context) throws MalformedURLException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         this.context = context;
         defaultConfigure(productName);
     }
 
     public void defaultConfigure(String product) throws MalformedURLException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "defaultConfigure");
+        }
         String fileAddress, buildConfigAddress;
         String serverAddress = Preference.getString(context, context.getResources().getString(R.string.firmware_server));
         if (Constants.DEFAULT_OTA_SERVER_SUB_DIRECTORY != null) {
@@ -73,10 +79,16 @@ public class OTAServerConfig {
     }
 
     public URL getPackageURL() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getPackageURL");
+        }
         return updatePackageURL;
     }
 
     public URL getBuildPropURL() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getBuildPropURL");
+        }
         return buildPropURL;
     }
 

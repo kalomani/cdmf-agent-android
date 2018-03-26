@@ -52,7 +52,7 @@ import java.util.Map;
  */
 public class DynamicClientManager implements APIResultCallBack {
 
-    private static final String TAG = DynamicClientManager.class.getSimpleName();
+    private static final String TAG = DynamicClientManager.class.getName();
     private static final String USER_ID = "userId";
     private static final String CONSUMER_KEY = "consumerKey";
     private static final String APPLICATION_NAME = "applicationName";
@@ -72,6 +72,9 @@ public class DynamicClientManager implements APIResultCallBack {
                                      Context context, APIResultCallBack apiResultCallback,
                                      ApiRegistrationProfile apiRegistrationProfile)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getClientCredentials");
+        }
         IdentityProxy.getInstance().setContext(context);
         EndPointInfo endPointInfo = new EndPointInfo();
         String endPoint = utils.getAPIServerURL(context) +
@@ -98,6 +101,9 @@ public class DynamicClientManager implements APIResultCallBack {
                                      Context context, APIResultCallBack apiResultCallback,
                                      ApiRegistrationProfile apiRegistrationProfile)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getClientCredentials");
+        }
         IdentityProxy.getInstance().setContext(context);
         EndPointInfo endPointInfo = new EndPointInfo();
         String endPoint = utils.getAPIServerURL(context) +
@@ -122,6 +128,9 @@ public class DynamicClientManager implements APIResultCallBack {
     public boolean unregisterClient(UnregisterProfile profile, ServerConfig utils, Context context,
                                  APIResultCallBack apiResultCallback)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "unregisterClient");
+        }
         StringBuilder endPoint = new StringBuilder();
         endPoint.append(utils.getAPIServerURL(context));
         endPoint.append(Constants.API_APPLICATION_UNREGISTRATION_CONTEXT);
@@ -141,6 +150,9 @@ public class DynamicClientManager implements APIResultCallBack {
     private void sendRequest(final EndPointInfo endPointInfo,
                              final APIResultCallBack apiResultCallback, final int requestCode,
                              final String username, final String password) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendRequest");
+        }
         RequestQueue queue =  null;
         int requestMethod = 0;
         org.wso2.iot.agent.proxy.utils.Constants.HTTP_METHODS httpMethod = endPointInfo.getHttpMethod();
@@ -250,6 +262,9 @@ public class DynamicClientManager implements APIResultCallBack {
     private void sendRequest(final EndPointInfo endPointInfo,
                              final APIResultCallBack apiResultCallback, final int requestCode,
                              final String adminAccessToken) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendRequest");
+        }
         RequestQueue queue =  null;
         int requestMethod = 0;
         org.wso2.iot.agent.proxy.utils.Constants.HTTP_METHODS httpMethod = endPointInfo.getHttpMethod();
@@ -332,7 +347,7 @@ public class DynamicClientManager implements APIResultCallBack {
                     headers.put("User-Agent", Constants.USER_AGENT);
                     String bearerAuthValue  = "Bearer " + adminAccessToken;
                     headers.put("Authorization", bearerAuthValue);
-                    
+
                     return headers;
                 }
             };
@@ -351,5 +366,9 @@ public class DynamicClientManager implements APIResultCallBack {
     }
 
     @Override
-    public void onReceiveAPIResult(Map<String, String> result, int requestCode) {}
+    public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceiveAPIResult");
+        }
+    }
 }

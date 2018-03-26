@@ -67,21 +67,30 @@ import static org.wso2.iot.agent.utils.FileTransferUtils.urlSplitter;
 public class FileUploadService extends JobIntentService {
     // Unique job ID for this service.
     private static final int JOB_ID = 105;
-    private static final String TAG = FileUploadService.class.getSimpleName();
+    private static final String TAG = FileUploadService.class.getName();
     private Resources resources;
     SharedPreferences.Editor editor;
 
     public FileUploadService() {
         super(/*TAG*/);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "Creation");
+        }
     }
 
     // Convenience method for enqueuing work in to this service.
     public static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "enqueueWork");
+        }
         enqueueWork(context, FileUploadService.class, JOB_ID, work);
     }
 
     @Override
     protected void onHandleWork(@Nullable Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onHandleWork");
+        }
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Starting File upload service");
         }
@@ -105,6 +114,9 @@ public class FileUploadService extends JobIntentService {
      */
     public void uploadFile(Operation operation) throws AndroidAgentException {
 
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "uploadFile");
+        }
         String fileName = "Unknown";
         editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         validateOperation(operation);
@@ -152,6 +164,9 @@ public class FileUploadService extends JobIntentService {
     }
 
     private void validateOperation(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "validateOperation");
+        }
         if (operation == null) {
             throw new AndroidAgentException("Null operation object");
         } else if (operation.getPayLoad() == null) {
@@ -164,6 +179,9 @@ public class FileUploadService extends JobIntentService {
     }
 
     private void setResponse(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "setResponse");
+        }
         operation.setEnabled(true);
         editor.putInt(resources.getString(R.string.FILE_UPLOAD_ID), operation.getId());
         editor.putString(resources.getString(R.string.FILE_UPLOAD_STATUS), operation.getStatus());
@@ -173,6 +191,9 @@ public class FileUploadService extends JobIntentService {
 
     private void printLogs(String ftpUserName, String host, String fileName,
                            String fileDirectory, String savingLocation, int serverPort) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "printLogs");
+        }
         Log.d(TAG, "FTP User Name: " + ftpUserName);
         Log.d(TAG, "FTP host address: " + host);
         Log.d(TAG, "FTP server port: " + serverPort);
@@ -195,7 +216,9 @@ public class FileUploadService extends JobIntentService {
     private void uploadFileUsingHTTPClient(Operation operation, String uploadURL, final String userName,
                                            final String password,
                                            String fileLocation) throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "uploadFileUsingHTTPClient");
+        }
         int serverResponseCode;
         HttpURLConnection connection = null;
         DataOutputStream dataOutputStream = null;
@@ -266,6 +289,9 @@ public class FileUploadService extends JobIntentService {
      * @throws IOException - IOException
      */
     private HttpURLConnection getHttpConnection(URL url, String userName, String password) throws IOException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getHttpConnection");
+        }
         final String boundary = "*****";
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (!userName.isEmpty()) {
@@ -285,6 +311,9 @@ public class FileUploadService extends JobIntentService {
     private void selectUploadClient(String protocol, Operation operation, String host, String ftpUserName,
                                     String ftpPassword, String uploadDirectory, String fileLocation,
                                     int serverPort) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "selectUploadClient");
+        }
         switch (protocol) {
             case Constants.FileTransfer.SFTP:
                 uploadFileUsingSFTPClient(operation, host, ftpUserName, ftpPassword,
@@ -315,6 +344,9 @@ public class FileUploadService extends JobIntentService {
                                           String ftpUserName, String ftpPassword,
                                           String uploadDirectory, String fileLocation, int serverPort)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "uploadFileUsingFTPClient");
+        }
         FTPClient ftpClient = new FTPClient();
         String fileName = null;
         InputStream inputStream = null;
@@ -373,6 +405,9 @@ public class FileUploadService extends JobIntentService {
                                            String ftpUserName, String ftpPassword,
                                            String uploadDirectory, String fileLocation, int serverPort)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "uploadFileUsingFTPSClient");
+        }
         FTPSClient ftpsClient = new FTPSClient();
         String fileName = null;
         InputStream inputStream = null;
@@ -430,6 +465,9 @@ public class FileUploadService extends JobIntentService {
                                            String ftpUserName, String ftpPassword,
                                            String uploadDirectory, String fileLocation, int serverPort)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "uploadFileUsingSFTPClient");
+        }
         Session session = null;
         Channel channel = null;
         ChannelSftp channelSftp = null;

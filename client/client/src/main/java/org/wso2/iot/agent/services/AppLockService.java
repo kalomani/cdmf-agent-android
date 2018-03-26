@@ -33,22 +33,30 @@ import java.util.List;
 public class AppLockService extends JobIntentService {
     // Unique job ID for this service.
     private static final int JOB_ID = 103;
-	private static final String TAG = "AppLockService";
+	private static final String TAG = AppLockService.class.getName();
 	private Context context;
 
 	public AppLockService() {
 		super(/*AppLockService.class.getName()*/);
 		context = AppLockService.this;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
 	}
 
     // Convenience method for enqueuing work in to this service.
     public static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enqueueWork");
+        }
         enqueueWork(context, AppLockService.class, JOB_ID, work);
     }
 
 	@Override
 	protected void onHandleWork(Intent lockIntent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onHandleWork");
+        }
 		Log.d(TAG, "Service started...!");
 
 		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

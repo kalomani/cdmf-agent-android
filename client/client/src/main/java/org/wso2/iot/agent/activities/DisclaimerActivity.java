@@ -20,6 +20,7 @@ package org.wso2.iot.agent.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,10 +35,15 @@ import org.wso2.iot.agent.utils.Response;
  * Activity which displays device information.
  */
 public class DisclaimerActivity extends Activity {
+    private static final String TAG = DisclaimerActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
+
         setContentView(R.layout.activity_disclaimer);
         Button btnContinue = (Button) findViewById(R.id.btn_continue);
         btnContinue.setOnClickListener(new View.OnClickListener() {
@@ -70,6 +76,9 @@ public class DisclaimerActivity extends Activity {
      * Check capability to have a separate managed profile.
      */
     private boolean hasWorkProfileCapability() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "hasWorkProfileCapability");
+        }
         DeviceState state = new DeviceState(this);
         Response androidForWorkCompatibility = state.evaluateAndroidForWorkCompatibility();
         return androidForWorkCompatibility.getCode();

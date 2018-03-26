@@ -45,7 +45,7 @@ import static android.content.pm.PackageManager.*;
  */
 public class AppUtils {
 
-    private static final String TAG = "AppUtils";
+    private static final String TAG = AppUtils.class.getName();
     private static final int DELETE_ALL_USERS = 0x00000002;
     private static final int INSTALL_ALL_USERS = 0x00000040;
     private static final int INSTALL_ALLOW_DOWNGRADE = 0x00000080;
@@ -62,6 +62,9 @@ public class AppUtils {
      * @param  packageUri - App package URI.
      */
     public static void silentInstallApp(final Context context, Uri packageUri) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "silentInstallApp");
+        }
         PackageManager pm = context.getPackageManager();
         PackageInstallObserver observer = new PackageInstallObserver() {
             @Override
@@ -240,6 +243,9 @@ public class AppUtils {
      * @param  packageName - App package name.
      */
     public static void silentUninstallApp(Context context, String packageName) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "silentUninstallApp");
+        }
         if (packageName != null && packageName.contains(PACKAGE_PREFIX)) {
             packageName = packageName.replace(PACKAGE_PREFIX, "");
         }
@@ -260,6 +266,9 @@ public class AppUtils {
     }
 
     private static void publishAppInstallStatus(Context context, String status, String error) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "publishAppInstallStatus");
+        }
         JSONObject result = new JSONObject();
 
         try {

@@ -84,6 +84,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 		@Override
 		protected Void doInBackground(Context... params) {
+            if (Constants.DEBUG_MODE_ENABLED) {
+                Log.d(TAG, "OperationTask.doInBackground");
+            }
 			if (params != null) {
 				MessageProcessor messageProcessor = new MessageProcessor(params[0]);
 				try {

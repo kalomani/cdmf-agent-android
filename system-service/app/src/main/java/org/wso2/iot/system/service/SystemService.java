@@ -19,7 +19,8 @@
 package org.wso2.iot.system.service;
 
 import android.annotation.TargetApi;
-// import android.app.IntentService;
+import android.app.IntentService;
+import android.app.IntentService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
@@ -38,6 +39,7 @@ import android.os.PowerManager;
 import android.os.SystemProperties;
 import android.os.UserManager;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -103,9 +105,9 @@ import static android.os.UserManager.ENSURE_VERIFY_APPS;
  * to the IoT Agent app. Agent can bind to this service and execute permitted operations by
  * sending necessary parameters.
  */
-public class SystemService extends JobIntentService {
+public class SystemService extends IntentService {
     private static int JOB_ID = 1331235;
-    private static final String TAG = SystemService.class.getSimpleName();
+    private static final String TAG = SystemService.class.getName();
     private static final int ACTIVATION_REQUEST = 0x00000002;
     private static final String BUILD_DATE_UTC_PROPERTY = "ro.build.date.utc";
     private static final int DEFAULT_STATE_INFO_CODE = 0;
@@ -124,25 +126,33 @@ public class SystemService extends JobIntentService {
     private static String[] AUTHORIZED_PINNING_APPS;
 
     public SystemService() {
-        super(/*TAG*/);
-        Log.d(TAG, "creation ------------- ");
+        super(TAG);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "onCreate ------------- ");
-        foreground();
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
+        // foreground();
+    }
+    /*
+
+    static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enqueueWork");
+        }
+        enqueueWork(context, SystemService.class, JOB_ID, work);
     }
 
-    /*
-    static void enqueueWork(Context context, Intent work) {
-        Log.d(TAG, "enqueueWork");
-        enqueueWork(context, SystemService.class, JOB_ID, work);
-    }*/
-
     protected void foreground() {
-        Log.d(TAG, "foreground");
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "foreground");
+        }
         // launch service in foreground
         int id = 1111255;
         Log.i(TAG, "launch service in foreground");
@@ -162,11 +172,14 @@ public class SystemService extends JobIntentService {
         } catch (NullPointerException npe) {
             Log.e(TAG,"failed to start on foreground ", npe);
         }
-    }
+    }*/
 
     @Override
-    protected void onHandleWork(Intent intent) {
-        Log.d(TAG, "onHandleWork");
+    @RequiresApi(Build.VERSION_CODES.M)
+    public void onHandleIntent(Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onHandleWork");
+        }
         context = this.getApplicationContext();
         cdmDeviceAdmin = new ComponentName(this, ServiceDeviceAdminReceiver.class);
         devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -204,6 +217,7 @@ public class SystemService extends JobIntentService {
             }
 
             if ((operationCode != null)) {
+                Log.d(TAG, "operationCode: " + operationCode);
                 if (Constants.AGENT_APP_PACKAGE_NAME.equals(intent.getPackage())) {
                     Log.d(TAG, "IoT agent has sent a command with operation code: " + operationCode + " command: " + command);
                     doTask(operationCode);
@@ -295,7 +309,9 @@ public class SystemService extends JobIntentService {
     }
 
     private void startAdmin() {
-        Log.d(TAG, "startAdmin");
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startAdmin");
+        }
         Intent intentDeviceAdmin = new Intent(this, MainActivity.class);
         intentDeviceAdmin.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intentDeviceAdmin);
@@ -306,8 +322,11 @@ public class SystemService extends JobIntentService {
      *
      * @param operationCode - Operation object.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     public void doTask(String operationCode) {
-        Log.d(TAG, "doTask");
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "doTask");
+        }
         switch (operationCode) {
             case Constants.Operation.DEVICE_LOCK:
                 enableHardLock();
@@ -481,7 +500,9 @@ public class SystemService extends JobIntentService {
      * Returns the device LogCat
      */
     public void getLogCat(String command) {
-        Log.d(TAG, "getLogCat");
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLogCat");
+        }
         try {
             JSONObject commandObj = new JSONObject(command);
             String filePath = Environment.getLegacyExternalStorageDirectory() + "/logcat" + commandObj.getInt("operation_id") + ".log";
@@ -509,6 +530,9 @@ public class SystemService extends JobIntentService {
      * Inject input to device
      */
     public void injectInput(String command) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "injectInput");
+        }
         Log.d(TAG, "injectInput:" + command);
         float x, y;
         int duration = -1, motionAction = -1;
@@ -570,6 +594,9 @@ public class SystemService extends JobIntentService {
      * Upgrading device firmware over the air (OTA).
      */
     public void upgradeFirmware(final boolean isStatusCheck) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "upgradeFirmware");
+        }
         Log.i(TAG, "An upgrade has been requested");
 
         Preference.putBoolean(context, context.getResources().getString(R.string.
@@ -680,6 +707,9 @@ public class SystemService extends JobIntentService {
     }
 
     private boolean checkNetworkOnline() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkNetworkOnline");
+        }
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         boolean status = false;
@@ -694,6 +724,9 @@ public class SystemService extends JobIntentService {
      * Rebooting the device.
      */
     private void rebootDevice() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "rebootDevice");
+        }
         Log.i(TAG, "Reboot request initiated by admin.");
         try {
             Thread.sleep(5000);
@@ -701,6 +734,8 @@ public class SystemService extends JobIntentService {
             powerManager.reboot(null);
         } catch (InterruptedException e) {
             Log.e(TAG, "Reboot initiating thread interrupted." + e);
+        } catch (NullPointerException npe) {
+            Log.e(TAG, "Reboot failed", npe);
         }
     }
 
@@ -708,6 +743,9 @@ public class SystemService extends JobIntentService {
      * Executing shell commands as super user.
      */
     private void executeShellCommand(String command) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "executeShellCommand");
+        }
         Process process;
         try {
             process = Runtime.getRuntime().exec("sh");
@@ -724,6 +762,9 @@ public class SystemService extends JobIntentService {
      * Silently installs the app resides in the provided URI.
      */
     private void silentInstallApp(Context context, String packageUri) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "silentInstallApp");
+        }
         AppUtils.silentInstallApp(context, Uri.parse(packageUri));
     }
 
@@ -731,11 +772,18 @@ public class SystemService extends JobIntentService {
      * Silently uninstalls the app resides in the provided URI.
      */
     private void silentUninstallApp(Context context, final String packageName) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "silentUninstallApp");
+        }
         AppUtils.silentUninstallApp(context, packageName);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private void enableHardLock() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enableHardLock");
+        }
         String message = context.getResources().getString(R.string.txt_lock_activity);
         if (appUri != null && !appUri.isEmpty()) {
             message = appUri;
@@ -756,6 +804,9 @@ public class SystemService extends JobIntentService {
     }
 
     private void publishFirmwareDownloadProgress() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "publishFirmwareDownloadProgress");
+        }
         String status = Preference.getString(context, context.getResources().getString(R.string.upgrade_download_status));
         Log.d(TAG, "Current status: " + status);
         boolean isAutomaticRetry = !Preference.hasPreferenceKey(context, context.getResources()
@@ -827,6 +878,9 @@ public class SystemService extends JobIntentService {
     }
 
     private void disableHardLock() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "disableHardLock");
+        }
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -834,6 +888,9 @@ public class SystemService extends JobIntentService {
     }
 
     private void publishFirmwareBuildDate() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "publishFirmwareBuildDate");
+        }
         String buildDate;
         JSONObject result = new JSONObject();
 

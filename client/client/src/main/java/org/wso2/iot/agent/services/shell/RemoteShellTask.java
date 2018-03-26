@@ -36,7 +36,7 @@ import java.io.InputStream;
  */
 public class RemoteShellTask extends Thread {
 
-    private static final String TAG = RemoteShellTask.class.getSimpleName();
+    private static final String TAG = RemoteShellTask.class.getName();
 
     private InputStream inputStream = null;
     private InputStream errorStream = null;

@@ -32,6 +32,7 @@ import org.wso2.iot.agent.utils.CommonUtils;
 import org.wso2.iot.agent.utils.Constants;
 
 public class AgentApplication extends Application {
+    public static final String  TAG = AgentApplication.class.getName();
 
     // Configs
     private int requestCode = 0;
@@ -39,6 +40,9 @@ public class AgentApplication extends Application {
 
     public AgentApplication() {
         // setup handler for uncaught exception
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         Thread.UncaughtExceptionHandler _unCaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
@@ -65,7 +69,9 @@ public class AgentApplication extends Application {
 
     public void onCreate(){
         super.onCreate();
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
         if (Constants.LogPublisher.LOG_PUBLISHER_IN_USE.equals(Constants.LogPublisher.SPLUNK_PUBLISHER)) {
             if (Constants.SplunkConfigs.TYPE_MINT.equals(Constants.SplunkConfigs.DATA_COLLECTOR_TYPE)) {
                 Mint.initAndStartSession(getApplicationContext(), Constants.SplunkConfigs.API_KEY);
@@ -75,6 +81,9 @@ public class AgentApplication extends Application {
             Mint.enableLogging(true);
             Mint.setLogging("*:D");
         }
+        // To replace android.net.conn.CONNECTIVITY_CHANGE on manifest
+        CommonUtils.registerForAgentStartupReceiver(this);
+        CommonUtils.registerForNetworkConnectedReceiver(this);
 
         if (Constants.SYSTEM_APP_ENABLED) {
             CommonUtils.registerSystemAppReceiver(this);

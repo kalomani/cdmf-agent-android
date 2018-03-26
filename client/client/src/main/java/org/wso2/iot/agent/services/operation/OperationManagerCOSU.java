@@ -55,7 +55,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.getIntent;
 
 public class OperationManagerCOSU extends OperationManager {
-    private static final String TAG = OperationManagerCOSU.class.getSimpleName();
+    private static final String TAG = OperationManagerCOSU.class.getName();
     private Context context = super.getContext();
     private Resources resources = context.getResources();
     private ResultPayload resultBuilder = super.getResultBuilder();
@@ -65,10 +65,14 @@ public class OperationManagerCOSU extends OperationManager {
     public OperationManagerCOSU(Context context) {
         super(context);
         notificationService = super.getNotificationService();
+        Log.d(TAG, "creation");
     }
 
     @Override
     public void wipeDevice(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "wipeDevice");
+        }
         JSONObject result = new JSONObject();
         try {
             result.put(getContextResources().getString(R.string.operation_status), "true");
@@ -93,6 +97,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void clearPassword(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearPassword");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
 
@@ -111,6 +118,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void installAppBundle(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installAppBundle");
+        }
         try {
             if (operation.getCode().equals(Constants.Operation.INSTALL_APPLICATION) ||
                     operation.getCode().equals(Constants.Operation.UPDATE_APPLICATION)) {
@@ -147,7 +157,9 @@ public class OperationManagerCOSU extends OperationManager {
         String name;
         String operationType;
         String schedule = null;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installApplication");
+        }
         try {
             if (!data.isNull(getContextResources().getString(R.string.app_type))) {
                 type = data.getString(getContextResources().getString(R.string.app_type));
@@ -201,8 +213,12 @@ public class OperationManagerCOSU extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    //@TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     public void setSystemUpdatePolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setSystemUpdatePolicy");
+        }
         int maintenanceStart;
         int maintenanceEnd;
         String systemUpdatePolicySelection;
@@ -247,6 +263,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void encryptStorage(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "encryptStorage");
+        }
         boolean doEncrypt = operation.isEnabled();
         JSONObject result = new JSONObject();
 
@@ -294,6 +313,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void changeLockCode(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "changeLockCode");
+        }
         getDevicePolicyManager().setPasswordMinimumLength(getCdmDeviceAdmin(), getDefaultPasswordMinLength());
         String password = null;
 
@@ -326,6 +348,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void enterpriseWipe(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "entrepriseWipe");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
 
@@ -342,15 +367,22 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void disenrollDevice(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "disenrollDevice");
+        }
         boolean status = operation.isEnabled();
         if (status) {
             CommonUtils.disableAdmin(getContext());
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    // @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void hideApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "disenrollDevice");
+        }
         String packageName = null;
         try {
             JSONObject hideAppData = new JSONObject(operation.getPayLoad().toString());
@@ -376,9 +408,13 @@ public class OperationManagerCOSU extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void unhideApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "unhideApp");
+        }
         String packageName = null;
         try {
             JSONObject hideAppData = new JSONObject(operation.getPayLoad().toString());
@@ -404,9 +440,13 @@ public class OperationManagerCOSU extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void blockUninstallByPackageName(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "blockUninstallByPackageName");
+        }
         String packageName = null;
         try {
             JSONObject hideAppData = new JSONObject(operation.getPayLoad().toString());
@@ -432,9 +472,13 @@ public class OperationManagerCOSU extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    // @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void setProfileName(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setProfileName");
+        }
         //sets the name of the user since the agent is the device owner.
         String profileName = null;
         try {
@@ -465,6 +509,9 @@ public class OperationManagerCOSU extends OperationManager {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void handleOwnersRestriction(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleOwnersRestriction");
+        }
         boolean isEnable = operation.isEnabled();
         String key = operation.getCode();
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
@@ -484,11 +531,17 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void handleDeviceOwnerRestriction(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleDeviceOwnerRestriction");
+        }
         handleOwnersRestriction(operation);
     }
 
     @Override
     public void configureWorkProfile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configureWorkProfile");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -497,6 +550,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void passOperationToSystemApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "passOperationToSystemApp");
+        }
         if (getApplicationManager().isPackageInstalled(Constants.SYSTEM_SERVICE_PACKAGE)) {
             CommonUtils.callSystemApp(getContext(), operation.getCode(),
                     Boolean.toString(operation.isEnabled()), null);
@@ -509,6 +565,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void restrictAccessToApplications(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "restrictAccessToApplications");
+        }
         AppRestriction appRestriction = CommonUtils.getAppRestrictionTypeAndList(operation, getResultBuilder(), getContextResources());
 
         if (Constants.AppRestriction.WHITE_LIST.equals(appRestriction.getRestrictionType())) {
@@ -533,12 +592,18 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void setPolicyBundle(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setPolicyBundle");
+        }
         getResultBuilder().build(operation);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void setRuntimePermissionPolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setRuntimePermissionPolicy");
+        }
         int permissionType;
         int defaultPermissionType;
         String permissionName;
@@ -589,17 +654,26 @@ public class OperationManagerCOSU extends OperationManager {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void setAppRuntimePermission(String packageName, String permission, int permissionType) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setAppRuntimePermission");
+        }
         getDevicePolicyManager().
                 setPermissionGrantState(getCdmDeviceAdmin(), packageName, permission, permissionType);
     }
 
     private void saveToPreferences(JSONArray array) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "saveToPreferences");
+        }
         Preference.putString(getContext(),
                 Constants.RuntimePermissionPolicy.PERMITTED_APP_DATA, array.toString());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void setAppAllRuntimePermission(String packageName, int permissionType) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setAppAllRuntimePermission");
+        }
         String[] permissionList = getContextResources().
                 getStringArray(R.array.runtime_permission_list_array);
         for (String permission : permissionList) {
@@ -607,9 +681,13 @@ public class OperationManagerCOSU extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
+    // @TargetApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     @Override
     public void setStatusBarDisabled(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setStatusBarDisabled");
+        }
         boolean isEnable = operation.isEnabled();
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
@@ -620,9 +698,13 @@ public class OperationManagerCOSU extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void setScreenCaptureDisabled(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setScreenCaptureDisabled");
+        }
         boolean isEnable = operation.isEnabled();
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
@@ -636,6 +718,9 @@ public class OperationManagerCOSU extends OperationManager {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void setAutoTimeRequired(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setAutoTimeRequired");
+        }
         boolean isEnable = operation.isEnabled();
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
@@ -649,6 +734,9 @@ public class OperationManagerCOSU extends OperationManager {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void configureCOSUProfile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configureCOSUProfile");
+        }
         int releaseTime;
         int freezeTime;
         try {
@@ -683,6 +771,9 @@ public class OperationManagerCOSU extends OperationManager {
     @Override
     public ComplianceFeature checkWorkProfilePolicy(Operation operation, ComplianceFeature policy)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkWorkProfilePolicy");
+        }
         policy.setCompliance(true);
         return policy;
     }
@@ -691,6 +782,9 @@ public class OperationManagerCOSU extends OperationManager {
     @Override
     public ComplianceFeature checkRuntimePermissionPolicy(Operation operation, ComplianceFeature policy)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkRuntimePermissionPolicy");
+        }
         int currentPermissionType;
         int policyPermissionType;
         try {
@@ -719,6 +813,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void ringDevice(org.wso2.iot.agent.beans.Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "ringDevice");
+        }
         operation.setStatus(resources.getString(R.string.operation_value_completed));
         resultBuilder.build(operation);
         Intent msgIntent = new Intent(context, KioskMsgAlarmService.class);
@@ -735,6 +832,9 @@ public class OperationManagerCOSU extends OperationManager {
 
     @Override
     public void displayNotification(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "displayNotification");
+        }
         try {
             operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
             operation.setOperationResponse(notificationService.buildResponse(Notification.Status.RECEIVED));
@@ -776,6 +876,9 @@ public class OperationManagerCOSU extends OperationManager {
     }
 
     private String getPermissionConstantValue(String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getPermissionConstantValue");
+        }
         return getContext().getString(getContextResources().getIdentifier(
                 key.toString(), "string", getContext().getPackageName()));
     }

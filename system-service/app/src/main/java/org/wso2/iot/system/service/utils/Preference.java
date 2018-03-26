@@ -3,6 +3,8 @@ package org.wso2.iot.system.service.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.util.Log;
+
 import org.wso2.iot.system.service.R;
 
 /**
@@ -11,6 +13,7 @@ import org.wso2.iot.system.service.R;
  */
 public class Preference {
 	private static final int DEFAULT_INDEX = 0;
+	private static final String TAG = Preference.class.getName();
 
 
 	/**
@@ -20,6 +23,9 @@ public class Preference {
 	 * @param value   - The actual value to be saved.
 	 */
 	public static void putLong(Context context, String key, long value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "putLong");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 								.getString(R.string.shared_pref_package),
@@ -36,6 +42,9 @@ public class Preference {
 	 * @param key     - Used to identify the value to to be retrieved.
 	 */
 	public static long getLong(Context context, String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLong");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 								.getString(R.string.shared_pref_package),
@@ -51,6 +60,9 @@ public class Preference {
 	 * @param value   - The actual value to be saved.
 	 */
 	public static void putString(Context context, String key, String value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "putString");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 				                                    .getString(R.string.shared_pref_package),
@@ -67,6 +79,9 @@ public class Preference {
 	 * @param key     - Used to identify the value to to be retrieved.
 	 */
 	public static String getString(Context context, String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLong");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 				                                    .getString(R.string.shared_pref_package),
@@ -82,6 +97,9 @@ public class Preference {
 	 * @param value   - The actual value to be saved.
 	 */
 	public static void putFloat(Context context, String key, float value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "putFloat");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 				                                    .getString(R.string.shared_pref_package),
@@ -98,6 +116,9 @@ public class Preference {
 	 * @param key     - Used to identify the value to to be retrieved.
 	 */
 	public static float getFloat(Context context, String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getFloat");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 				                                    .getString(R.string.shared_pref_package),
@@ -113,6 +134,9 @@ public class Preference {
 	 * @param value   - The actual value to be saved.
 	 */
 	public static void putInt(Context context, String key, int value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "putIng");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 						                             .getString(R.string.shared_pref_package),
@@ -129,6 +153,9 @@ public class Preference {
 	 * @param key     - Used to identify the value to to be retrieved.
 	 */
 	public static int getInt(Context context, String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getInt");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 						                             .getString(R.string.shared_pref_package),
@@ -144,6 +171,9 @@ public class Preference {
 	 * @param value   - The actual value to be saved.
 	 */
 	public static void putBoolean(Context context, String key, boolean value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "putBoolean");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 						                             .getString(R.string.shared_pref_package),
@@ -160,6 +190,9 @@ public class Preference {
 	 * @param key     - Used to identify the value to to be retrieved.
 	 */
 	public static boolean getBoolean(Context context, String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getBoolean");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 						                             .getString(R.string.shared_pref_package),
@@ -173,6 +206,9 @@ public class Preference {
 	 * @param context - The context of activity which is requesting to put data.
 	 */
 	public static void clearPreferences(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearPreferences");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 						                             .getString(R.string.shared_pref_package),
@@ -182,6 +218,9 @@ public class Preference {
 	}
 
 	public static boolean hasPreferenceKey(Context context, String key){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "hasPreferenceKey");
+        }
 		SharedPreferences mainPref =
 				context.getSharedPreferences(context.getResources()
 								.getString(R.string.shared_pref_package),

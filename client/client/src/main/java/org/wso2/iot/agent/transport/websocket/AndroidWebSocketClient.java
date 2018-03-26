@@ -29,6 +29,7 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.handshake.ServerHandshake;
 import org.wso2.iot.agent.services.screenshare.ScreenSharingService;
 import org.wso2.iot.agent.transport.exception.TransportHandlerException;
+import org.wso2.iot.agent.utils.Constants;
 
 import java.net.URI;
 
@@ -38,7 +39,7 @@ import java.net.URI;
 public class AndroidWebSocketClient extends WebSocketClient {
 
     private Context context;
-    private String TAG = "wsClient";
+    private static final String TAG = AndroidWebSocketClient.class.getName();
     private int operationId;
 
     /**
@@ -50,21 +51,31 @@ public class AndroidWebSocketClient extends WebSocketClient {
      */
     public AndroidWebSocketClient(Context context, URI serverUri, Draft draft, int operationId) {
         super(serverUri, draft);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         this.context = context;
         this.operationId = operationId;
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onOpen");
+        }
         if (this.operationId != WebSocketSessionHandler.getInstance(context).getOperationId()) {
             this.close();
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onMessage(String message) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onMessage");
+        }
         try {
             WebSocketSessionHandler.getInstance(context).handleSessionMessage(message);
         } catch (TransportHandlerException e) {
@@ -72,14 +83,22 @@ public class AndroidWebSocketClient extends WebSocketClient {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClose(int code, String reason, boolean remote) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onClose");
+        }
         Log.e(TAG, "Close the web socket connection due to  " + reason);
         WebSocketSessionHandler.getInstance(context).endSession();
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onError(Exception ex) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onError");
+        }
         WebSocketSessionHandler.getInstance(context).endSession();
         Log.e(TAG, "Error occurred while handling web socket session ", ex);
 

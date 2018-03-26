@@ -35,10 +35,13 @@ import java.net.MalformedURLException;
  */
 public class BatteryChargingStateReceiver extends BroadcastReceiver {
 
-    private static String TAG = BatteryChargingStateReceiver.class.getSimpleName();
+    private static String TAG = BatteryChargingStateReceiver.class.getName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
         int level = intent.getIntExtra("level", 0);
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Battery Level: " + Integer.toString(level) + "%");

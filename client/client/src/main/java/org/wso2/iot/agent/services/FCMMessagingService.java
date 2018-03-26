@@ -52,6 +52,9 @@ public class FCMMessagingService extends FirebaseMessagingService {
     }
 
     protected void foreground() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "foreground");
+        }
         // launch service in foreground
         int id = 11140;
         Log.i(TAG, "launch service in foreground");
@@ -75,6 +78,9 @@ public class FCMMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage message) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onMessageReceived");
+        }
         Log.i(TAG, "New FCM notification. Message id: " + message.getMessageId());
         syncMessages();
         if (Constants.SYSTEM_APP_ENABLED && Preference.getBoolean(this,
@@ -86,6 +92,9 @@ public class FCMMessagingService extends FirebaseMessagingService {
     }
 
     private void syncMessages() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "syncMessages");
+        }
         try {
             if (Preference.getBoolean(this, Constants.PreferenceFlag.REGISTERED)) {
                 long currentTimeStamp = Calendar.getInstance().getTimeInMillis();

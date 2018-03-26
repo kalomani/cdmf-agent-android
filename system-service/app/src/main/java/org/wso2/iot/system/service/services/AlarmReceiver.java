@@ -36,6 +36,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (Constants.DEBUG_MODE_ENABLED) {
+			Log.d(TAG, "onReceive");
+		}
 		Log.d(TAG, "Scheduled task triggered.");
 
 		if (intent.hasExtra(context.getResources().getString(R.string.alarm_scheduled_operation))) {

@@ -31,6 +31,9 @@ public class NetworkConnectedReceiver extends BroadcastReceiver {
     private static final String TAG = NetworkConnectedReceiver.class.getName();
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
         Log.i(TAG, "Network change event triggered.");
         if(!Preference.getBoolean(context, FRESH_BOOTUP_FLAG))	{
             if (!Preference.getBoolean(context, Constants.PreferenceFlag.REGISTERED) && CommonUtils.

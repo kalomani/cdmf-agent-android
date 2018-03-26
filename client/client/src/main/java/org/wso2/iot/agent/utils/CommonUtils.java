@@ -33,6 +33,7 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.UserManager;
 import android.provider.Settings;
@@ -67,8 +68,10 @@ import org.wso2.iot.agent.proxy.beans.EndPointInfo;
 import org.wso2.iot.agent.proxy.interfaces.APIResultCallBack;
 import org.wso2.iot.agent.proxy.utils.Constants.HTTP_METHODS;
 import org.wso2.iot.agent.services.AgentDeviceAdminReceiver;
+import org.wso2.iot.agent.services.AgentStartupReceiver;
 import org.wso2.iot.agent.services.DynamicClientManager;
 import org.wso2.iot.agent.services.LocationUpdateReceiver;
+import org.wso2.iot.agent.services.NetworkConnectedReceiver;
 import org.wso2.iot.agent.services.PolicyOperationsMapper;
 import org.wso2.iot.agent.services.PolicyRevokeHandler;
 import org.wso2.iot.agent.services.ResultPayload;
@@ -89,6 +92,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Permission;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -107,7 +111,7 @@ import javax.security.auth.x500.X500Principal;
  */
 public class CommonUtils {
 
-	public static String TAG = CommonUtils.class.getSimpleName();
+	public static String TAG = CommonUtils.class.getName();
 	private static final String PROTOCOL_HTTPS = "https://";
 	private static final String PROTOCOL_HTTP = "http://";
 	private static final String COLON = ":";
@@ -123,6 +127,9 @@ public class CommonUtils {
 									  String requestParams,
 									  APIResultCallBack apiResultCallBack, int requestCode) {
 
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "callSecuredAPI");
+        }
 		EndPointInfo apiUtilities = new EndPointInfo();
 		ServerConfig utils = new ServerConfig();
 		apiUtilities.setEndPoint(endpoint);
@@ -162,7 +169,9 @@ public class CommonUtils {
 	 * @param listener - DeviceCertCreationListener which provide device .
 	 */
 	public static void generateDeviceCertificate(final Context context, final DeviceCertCreationListener listener) throws AndroidAgentException{
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "generateDeviceCertificate");
+        }
 		if(context.getFileStreamPath(Constants.DEVICE_CERTIFCATE_NAME).exists()){
 			try {
 				listener.onDeviceCertCreated(new BufferedInputStream(context.openFileInput(Constants.DEVICE_CERTIFCATE_NAME)));
@@ -231,6 +240,9 @@ public class CommonUtils {
 	 * @param context - Application context.
 	 */
 	public static void clearAppData(Context context) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearAppData");
+        }
 		try {
 			revokePolicy(context);
 		} catch (SecurityException e) {
@@ -248,6 +260,9 @@ public class CommonUtils {
 	 * @return - Network availability status.
 	 */
 	public static boolean isNetworkAvailable(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isNetworkAvailable");
+        }
 		ConnectivityManager connectivityManager =
 				(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = connectivityManager.getActiveNetworkInfo();
@@ -280,6 +295,9 @@ public class CommonUtils {
 	 * @throws AndroidAgentException
 	 */
 	public static void unRegisterClientApp(Context context, APIResultCallBack apiCallBack) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "unregisterClientApp");
+        }
 		String serverIP = Constants.DEFAULT_HOST;
 		String prefIP = Preference.getString(context.getApplicationContext(), Constants.PreferenceFlag.IP);
 		if (prefIP != null) {
@@ -321,6 +339,9 @@ public class CommonUtils {
 	 * @param context - Application context.
 	 */
 	public static void disableAdmin(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "disableAdmin");
+        }
 		DevicePolicyManager devicePolicyManager;
 		ComponentName demoDeviceAdmin;
 		devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -333,6 +354,9 @@ public class CommonUtils {
 	 * @param context - Application context.
 	 */
 	public static void revokePolicy(Context context) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokePolicy");
+        }
 		String payload = Preference.getString(context, Constants.PreferenceFlag.APPLIED_POLICY);
 		PolicyOperationsMapper operationsMapper = new PolicyOperationsMapper();
 		ObjectMapper mapper = new ObjectMapper();
@@ -363,6 +387,9 @@ public class CommonUtils {
 	 * @param context - Application context.
 	 */
 	public static void clearClientCredentials(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearClientCredentials");
+        }
 		Preference.removePreference(context, Constants.CLIENT_ID);
 		Preference.removePreference(context, Constants.CLIENT_SECRET);
 	}
@@ -376,6 +403,9 @@ public class CommonUtils {
 	 */
 	public static void callSystemApp(Context context, String operation, String command, String appUri) {
 		if(Constants.SYSTEM_APP_ENABLED) {
+		    if (Constants.DEBUG_MODE_ENABLED) {
+                Log.d(TAG, "callSystemApp: " + operation);
+            }
 			Intent intent =  new Intent(Constants.SYSTEM_APP_SERVICE_START_ACTION);
 			Intent explicitIntent = createExplicitFromImplicitIntent(context, intent);
 			if (explicitIntent != null) {
@@ -420,36 +450,32 @@ public class CommonUtils {
 				}
 				intent.putExtra("command", command);
 			}
-            // context.startServiceAsUser(intent, android.os.Process.myUserHandle());
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundServiceAsUser(intent, android.os.Process.myUserHandle());
-            } else {
-                context.startServiceAsUser(intent, android.os.Process.myUserHandle());
-            }
+            context.startServiceAsUser(intent, android.os.Process.myUserHandle());
 		} else {
 			Log.e(TAG, "System app not enabled.");
 		}
 	}
 
 	public static void callSystemAppInit(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "callSystemAppInit");
+        }
 		if(Constants.SYSTEM_APP_ENABLED) {
 			Intent intent =  new Intent(Constants.SYSTEM_APP_SERVICE_START_ACTION);
 			Intent explicitIntent = createExplicitFromImplicitIntent(context, intent);
 			if (explicitIntent != null) {
 				intent = explicitIntent;
 			}
-            // context.startServiceAsUser(intent, android.os.Process.myUserHandle());
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			    context.startForegroundServiceAsUser(intent, android.os.Process.myUserHandle());
-            } else {
-                context.startServiceAsUser(intent, android.os.Process.myUserHandle());
-            }
+            context.startServiceAsUser(intent, android.os.Process.myUserHandle());
 		} else {
 			Log.e(TAG, "System app not enabled.");
 		}
 	}
 
 	public static boolean isSystemAppInstalled(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isSystemAppInstalled");
+        }
 		PackageManager packageManager = context.getPackageManager();
 		boolean systemAppInstalled;
 		try {
@@ -463,6 +489,9 @@ public class CommonUtils {
 	}
 
 	public static Intent createExplicitFromImplicitIntent(Context context, Intent implicitIntent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "createExplicitFromImplicitIntent");
+        }
 		//Retrieve all services that can match the given intent
 		PackageManager pm = context.getPackageManager();
 		List<ResolveInfo> resolveInfo = pm.queryIntentServices(implicitIntent, 0);
@@ -487,7 +516,50 @@ public class CommonUtils {
 		return explicitIntent;
 	}
 
-	public static void registerSystemAppReceiver(Context context) {
+    /**
+     *  register to have Connectivity change for AgentStartupReceiver.
+     * @param context Context object
+     */
+	public static void registerForAgentStartupReceiver(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "registerForAgentStartupReceiver");
+        }
+        // for AgentStartupReceiver
+        IntentFilter agentIntentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        // agentIntentFilter.addAction("android.intent.action.BOOT_COMPLETED");
+        // agentIntentFilter.addAction("android.intent.action.QUICKBOOT_POWERON");
+        // agentIntentFilter.addAction("android.intent.action.ACTION_POWER_CONNECTED");
+        // agentIntentFilter.addAction("org.ws2.iot.agent.APPLICATION_UPDATED");
+        // agentIntentFilter.addAction("org.ws2.iot.agent.APPLICATION_CRASHED");
+        // agentIntentFilter.addCategory("android.intent.category.DEFAULT");
+        AgentStartupReceiver agent = new AgentStartupReceiver();
+        context.registerReceiver(agent, agentIntentFilter);
+
+    }
+
+    /**
+     *  register to have Connectivity change for NetworkConnectedReceiver.
+     * @param context Context object
+     */
+    public static void registerForNetworkConnectedReceiver(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "registerForNetworkConnectedReceiver");
+        }
+        // for NetworkConnectedReceiver
+        IntentFilter networkIntentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        // networkIntentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        NetworkConnectedReceiver network = new NetworkConnectedReceiver();
+        context.registerReceiver(network, networkIntentFilter);
+    }
+
+    /**
+     *  register for SystemAppReceiver
+     * @param context Context object
+     */
+    public static void registerSystemAppReceiver(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "registerSystemAppReceiver");
+        }
 		IntentFilter filter = new IntentFilter(Constants.SYSTEM_APP_BROADCAST_ACTION);
 		filter.addCategory(Intent.CATEGORY_DEFAULT);
 		SystemServiceResponseReceiver receiver = new SystemServiceResponseReceiver();
@@ -500,6 +572,9 @@ public class CommonUtils {
 	 * @return list of installed app packages
 	 */
 	public static List<String> getInstalledAppPackages(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getInstalledAppPackages");
+        }
 		ApplicationManager applicationManager = new ApplicationManager(context.getApplicationContext());
 		List<ApplicationInfo> installedApplications = applicationManager.getInstalledApplications();
 		List<String> installedAppPackages = new ArrayList<>();
@@ -515,6 +590,9 @@ public class CommonUtils {
 	 * @return list of installed app packages
 	 */
 	public static List<String> getInstalledAppPackagesByUser(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getInstalledAppPackagesByUser");
+        }
 		return new ApplicationManager(context.getApplicationContext()).getInstalledAppsByUser();
 	}
 
@@ -525,6 +603,9 @@ public class CommonUtils {
 	 * @return list of package list that are not system apps
 	 */
 	public static List<String> getAppsOfUser(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getAppsOfUser");
+        }
 		return new ApplicationManager(context.getApplicationContext()).getAppsOfUser();
 	}
 
@@ -532,6 +613,9 @@ public class CommonUtils {
 	                                                          ResultPayload resultBuilder,
 	                                                          Resources resources)
 			throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getAppRestrictionTypeAndList");
+        }
 		AppRestriction appRestriction = new AppRestriction();
 		JSONArray permittedApps = null;
 		try {
@@ -574,6 +658,9 @@ public class CommonUtils {
 															  ResultPayload resultBuilder,
 															  Resources resources)
 			throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getAppRuntimePermissionTypeAndList");
+        }
 		AppRestriction appRestriction = new AppRestriction();
 		JSONArray restrictedApps = null;
 		try {
@@ -613,6 +700,9 @@ public class CommonUtils {
 	}
 
 	public static void saveHostDeatils(Context context, String host){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "saveHostDeatils");
+        }
 		if (host.contains(PROTOCOL_HTTP)) {
 			String hostWithPort = host.substring(PROTOCOL_HTTP.length(), host.length());
 			Preference.putString(context.getApplicationContext(), Constants.PreferenceFlag.IP,
@@ -638,6 +728,9 @@ public class CommonUtils {
 	}
 
 	public static String getHostFromUrl (String url) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getHostFromUrl");
+        }
 		if (url.contains(COLON)) {
 			return url.substring(0, url.indexOf(COLON));
 		} else {
@@ -646,6 +739,9 @@ public class CommonUtils {
 	}
 
 	public static String getPortFromUrl (String url, String protocol) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getPortFromUrl");
+        }
 		if (url.contains(COLON)) {
 			return url.substring((url.indexOf(COLON) + 1), url.length());
 		} else {
@@ -658,6 +754,9 @@ public class CommonUtils {
 	}
 
 	public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isServiceRunning");
+        }
 		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 		try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -686,6 +785,9 @@ public class CommonUtils {
 	}
 
 	public static Location getLocation(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLocation");
+        }
 		Intent serviceIntent = new Intent(context, LocationService.class);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			context.startForegroundService(serviceIntent);
@@ -696,6 +798,9 @@ public class CommonUtils {
 	}
 
 	public static void displayNotification(Context context, int icon, String title, String message, Class<?> sourceActivityClass, String tag, int id){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "displayNotification");
+        }
 		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder mBuilder = null;
 		try {
@@ -783,6 +888,9 @@ public class CommonUtils {
 
 	@RequiresApi(21)
 	public static void allowUnknownSourcesForProfile(final Context context, final boolean isEnabled) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "allowUnknownSourcesForProfile");
+        }
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			final DevicePolicyManager manager = (DevicePolicyManager) context
 					.getSystemService(Context.DEVICE_POLICY_SERVICE);

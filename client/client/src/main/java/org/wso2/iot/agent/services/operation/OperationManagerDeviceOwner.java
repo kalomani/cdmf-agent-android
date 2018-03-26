@@ -49,17 +49,21 @@ import java.util.List;
 import java.util.Objects;
 
 public class OperationManagerDeviceOwner extends OperationManager {
-    private static final String TAG = OperationManagerDeviceOwner.class.getSimpleName();
+    private static final String TAG = OperationManagerDeviceOwner.class.getName();
     private NotificationService notificationService;
     private static final String STATUS = "status";
 
     public OperationManagerDeviceOwner(Context context) {
         super(context);
         notificationService = super.getNotificationService();
+        Log.d(TAG, "creation");
     }
 
     @Override
     public void displayNotification(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "displayNotification");
+        }
         try {
             operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
             operation.setOperationResponse(notificationService.buildResponse(Notification.Status.RECEIVED));
@@ -95,6 +99,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
 
     @Override
     public void clearPassword(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearPassword");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
 
@@ -113,6 +120,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
 
     @Override
     public void installAppBundle(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installAppBundle");
+        }
         try {
             if (operation.getCode().equals(Constants.Operation.INSTALL_APPLICATION)||
                     operation.getCode().equals(Constants.Operation.UPDATE_APPLICATION)) {
@@ -149,7 +159,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
         String name;
         String operationType;
         String schedule = null;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installApplication");
+        }
         try {
             if (!data.isNull(getContextResources().getString(R.string.app_type))) {
                 type = data.getString(getContextResources().getString(R.string.app_type));
@@ -205,6 +217,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
 
     @Override
     public void setSystemUpdatePolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setSystemUpdatePolicy");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -213,6 +228,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
 
     @Override
     public void encryptStorage(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "encryptStorage");
+        }
         boolean doEncrypt = operation.isEnabled();
         JSONObject result = new JSONObject();
 
@@ -260,6 +278,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
 
     @Override
     public void changeLockCode(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "changeLockCode");
+        }
         getDevicePolicyManager().setPasswordMinimumLength(getCdmDeviceAdmin(), getDefaultPasswordMinLength());
         String password = null;
 
@@ -293,6 +314,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void enterpriseWipe(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enterpriseWipe");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
 
@@ -318,6 +342,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void hideApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "hideApp");
+        }
         String packageName = null;
         try {
             JSONObject hideAppData = new JSONObject(operation.getPayLoad().toString());
@@ -346,6 +373,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void unhideApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "unhideApp");
+        }
         String packageName = null;
         try {
             JSONObject hideAppData = new JSONObject(operation.getPayLoad().toString());
@@ -374,6 +404,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void blockUninstallByPackageName(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "blockUninstallByPackageName");
+        }
         String packageName = null;
         try {
             JSONObject hideAppData = new JSONObject(operation.getPayLoad().toString());
@@ -402,6 +435,9 @@ public class OperationManagerDeviceOwner extends OperationManager {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void setProfileName(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setProfileName");
+        }
         //sets the name of the user since the agent is the device owner.
         String profileName = null;
         try {
@@ -429,9 +465,13 @@ public class OperationManagerDeviceOwner extends OperationManager {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.M)
     @Override
     public void handleOwnersRestriction(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleOwnersRestriction");
+        }
         boolean isEnable = operation.isEnabled();
         String key = "";
         switch (operation.getCode()) {
@@ -812,6 +852,7 @@ public class OperationManagerDeviceOwner extends OperationManager {
     public ComplianceFeature checkRuntimePermissionPolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
         int currentPermissionType;
         int policyPermissionType;
+        Log.d(TAG,"checkRuntimePermissionPolicy");
         try {
             JSONObject runtimePermissionData = new JSONObject(operation.getPayLoad().toString());
             if (!runtimePermissionData.isNull("defaultType")) {

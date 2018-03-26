@@ -54,11 +54,15 @@ import java.util.List;
 public class AgentStartupReceiver extends BroadcastReceiver {
 
     public static final int DEFAULT_ID = -1;
-    private static final String TAG = AgentStartupReceiver.class.getSimpleName();
+    private static final String TAG = AgentStartupReceiver.class.getName();
     private Resources resources;
+
 
     @Override
     public void onReceive(final Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
         String action = intent.getAction();
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Action received: " + action);
@@ -138,6 +142,9 @@ public class AgentStartupReceiver extends BroadcastReceiver {
     }
 
     private boolean isNetworkConnected(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isNetworkConnected");
+        }
         if (intent.getExtras() != null) {
             final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivityManager == null) {
@@ -163,6 +170,9 @@ public class AgentStartupReceiver extends BroadcastReceiver {
      * @param context - Application context.
      */
     private void setDeviceLock(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setDeviceLock");
+        }
         boolean isLocked = Preference.getBoolean(context, Constants.IS_LOCKED);
         String lockMessage = Preference.getString(context, Constants.LOCK_MESSAGE);
 

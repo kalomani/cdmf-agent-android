@@ -593,10 +593,10 @@ android {
             // Set DEFAULT_OWNERSHIP to null if no overriding is needed. Other possible values are,
             // BYOD or COPE. If you are using the mutual SSL authentication
             // This value must be set to a value other than null.
-            buildConfigField "String", "DEFAULT_OWNERSHIP", "\"BYOD\""
+            buildConfigField "String", "DEFAULT_OWNERSHIP", "\"COPE\""
             //DEFAULT_HOST - Hardcode the server host to avoid having the user type it during
             //enrollment. If the user must type the hostname/IP during enrollment, leave it as null.
-            buildConfigField "String", "DEFAULT_HOST", "null"
+            buildConfigField "String", "DEFAULT_HOST", "\"http://ldn-003.m31.io:8280\""
             // APP_MANAGER_HOST: If the App store host is different from the DEFAULT_HOST
             // change this value.
             buildConfigField "String", "APP_MANAGER_HOST", "null"
@@ -617,7 +617,7 @@ android {
             // System service specific configurations.
             // SYSTEM_APP_ENABLED: This is to set if the system app will also be installed.
             // If this is set org.wso2.iot.system.service must also be available in the device.
-            buildConfigField "boolean", "SYSTEM_APP_ENABLED", "false"
+            buildConfigField "boolean", "SYSTEM_APP_ENABLED", "true"
             // SYSTEM_SERVICE_PACKAGE: If system service app is in use, the package name of it is
             // defined here so that the agent knows the package name of the system service to
             // contact.

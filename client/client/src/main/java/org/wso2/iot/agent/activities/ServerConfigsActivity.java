@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -43,7 +44,7 @@ import org.wso2.iot.agent.utils.Response;
  * This the the activity that is used to capture the server's host name.
  */
 public class ServerConfigsActivity extends AppCompatActivity {
-
+    private static final String TAG = ServerConfigsActivity.class.getName();
 	private EditText editTextServerIP;
 	private Button btnStartRegistration;
 	private Context context;
@@ -51,7 +52,9 @@ public class ServerConfigsActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onCreate");
+		}
 		if(Constants.OWNERSHIP_COSU.equals(Constants.DEFAULT_OWNERSHIP)) {
 			Intent intent = new Intent(ServerConfigsActivity.this, KioskActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -151,7 +154,9 @@ public class ServerConfigsActivity extends AppCompatActivity {
 	 * entered.
 	 */
 	private void enableSubmitIfReady() {
-
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "enableSubmitIfReady");
+		}
 		boolean isReady = false;
 
 		if (editTextServerIP.getText().toString().length() >= 1) {
@@ -174,6 +179,9 @@ public class ServerConfigsActivity extends AppCompatActivity {
 	 * This method is called to open AuthenticationActivity.
 	 */
 	private void startAuthenticationActivity() {
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "startAuthenticationActivity");
+		}
 		Intent intent = new Intent(ServerConfigsActivity.this, AuthenticationActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
@@ -181,6 +189,9 @@ public class ServerConfigsActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onDestroy");
+		}
 		context = null;
 		super.onDestroy();
 	}

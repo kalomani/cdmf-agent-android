@@ -36,10 +36,13 @@ import java.util.Locale;
  */
 public class LocalNotification {
 
-    private static final String TAG = LocalNotification.class.getSimpleName();
+    private static final String TAG = LocalNotification.class.getName();
     private static final int DEFAULT_INT_VALUE = 0;
 
     public static void startPolling(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startPolling");
+        }
         int interval = Preference.getInt(context, context.getResources().getString(R.string.shared_pref_frequency));
         if (interval == DEFAULT_INT_VALUE) {
             interval = Constants.DEFAULT_INTERVAL;
@@ -78,6 +81,9 @@ public class LocalNotification {
     }
 
     public static void stopPolling(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "stopPolling");
+        }
         if (Preference.getBoolean(context, Constants.PreferenceFlag.LOCAL_NOTIFIER_INVOKED_PREF_KEY)) {
             Preference.putBoolean(context, Constants.PreferenceFlag.LOCAL_NOTIFIER_INVOKED_PREF_KEY, false);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

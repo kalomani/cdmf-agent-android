@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -38,7 +39,7 @@ import org.wso2.iot.agent.utils.Preference;
 import org.wso2.iot.agent.utils.Response;
 
 public class WorkProfileSelectionActivity extends AppCompatActivity {
-
+    private static final String TAG = WorkProfileSelectionActivity.class.getSimpleName();
     private Context context;
     private static final int TAG_BTN_ENABLE_PROFILE = 0;
     private static final int TAG_BTN_SKIP_PROFILE = 2;
@@ -47,6 +48,9 @@ public class WorkProfileSelectionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
         setContentView(R.layout.activity_enable_work_profile);
 
         context = this.getApplicationContext();
@@ -76,6 +80,9 @@ public class WorkProfileSelectionActivity extends AppCompatActivity {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void manageAndroidForWorkReception() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "manageAndroidForWorkReception");
+        }
         if (manager.isProfileOwnerApp(getApplicationContext().getPackageName())) {
             /* If the managed profile is already set up, we show the enrollment screen. */
             skipToEnrollment();
@@ -106,6 +113,9 @@ public class WorkProfileSelectionActivity extends AppCompatActivity {
      * Start WorkProfileManager which configures Android Managed Profile Feature.
      */
     private void startManagedProfileManager() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startManagedProfileManager");
+        }
         Intent ManagedProfileManager = new Intent(getApplicationContext(), WorkProfileManager.class);
         startActivity(ManagedProfileManager);
         finish();
@@ -115,6 +125,9 @@ public class WorkProfileSelectionActivity extends AppCompatActivity {
      * Go to the Enrollment Screen if the user don't want a separate managed profile.
      */
     private void skipToEnrollment() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "skipToEnrollment");
+        }
         Intent intent = new Intent(context, ServerConfigsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -124,6 +137,9 @@ public class WorkProfileSelectionActivity extends AppCompatActivity {
      * Display Manage-profile provisioning prompt
      */
     private void displayProfileProvisionPromptScreen(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "displayProfileProvisionPromptScreen");
+        }
         Button btnEnableMngProfile;
         Button btnSkipProfile;
 

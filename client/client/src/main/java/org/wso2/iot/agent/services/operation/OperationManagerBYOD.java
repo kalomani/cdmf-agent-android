@@ -61,7 +61,7 @@ import static android.security.KeyStore.getApplicationContext;
 
 public class OperationManagerBYOD extends OperationManager {
 
-    private static final String TAG = OperationManagerBYOD.class.getSimpleName();
+    private static final String TAG = OperationManagerBYOD.class.getName();
     private Context context=super.getContext();
     private Resources resources = context.getResources();
     private ResultPayload resultBuilder=super.getResultBuilder();
@@ -71,6 +71,7 @@ public class OperationManagerBYOD extends OperationManager {
     public OperationManagerBYOD(Context context){
         super(context);
         notificationService = super.getNotificationService();
+        Log.d(TAG, "creation");
     }
 
     @Override
@@ -80,6 +81,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void uploadFile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "uploadFile");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
         try {
             JSONObject inputData =
@@ -139,6 +143,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void displayNotification(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "displayNotification");
+        }
         try {
             operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
             operation.setOperationResponse(notificationService.buildResponse(Notification.Status.RECEIVED));
@@ -174,6 +181,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void clearPassword(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearpassword");
+        }
         try {
             getDevicePolicyManager().setPasswordQuality(getCdmDeviceAdmin(),
                     DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
@@ -201,6 +211,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void installAppBundle(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installAppBundle");
+        }
         try {
             if (operation.getCode().equals(Constants.Operation.INSTALL_APPLICATION) ||
                     operation.getCode().equals(Constants.Operation.UPDATE_APPLICATION)) {
@@ -237,7 +250,9 @@ public class OperationManagerBYOD extends OperationManager {
         String name;
         String operationType;
         String schedule = null;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installApplication");
+        }
         try {
             if (!data.isNull(getContextResources().getString(R.string.app_type))) {
                 type = data.getString(getContextResources().getString(R.string.app_type));
@@ -293,6 +308,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void setSystemUpdatePolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setSystemUpdatePolicy");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -301,6 +319,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void encryptStorage(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "encryptStorage");
+        }
         boolean doEncrypt = operation.isEnabled();
         JSONObject result = new JSONObject();
 
@@ -348,6 +369,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void changeLockCode(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "changeLockCode");
+        }
         getDevicePolicyManager().setPasswordMinimumLength(getCdmDeviceAdmin(), getDefaultPasswordMinLength());
         String password = null;
 
@@ -380,12 +404,18 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void enterpriseWipe(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enterpriseWipe");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_completed));
         getResultBuilder().build(operation);
     }
 
     @Override
     public void blacklistApps(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "blacklistApps");
+        }
         ArrayList<DeviceAppInfo> apps = new ArrayList<>(getAppList().getInstalledApps().values());
         JSONArray appList = new JSONArray();
         JSONArray blacklistApps = new JSONArray();
@@ -438,6 +468,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void disenrollDevice(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "disenrollDevice");
+        }
         boolean status = operation.isEnabled();
         if (status) {
             CommonUtils.disableAdmin(getContext());
@@ -446,6 +479,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void hideApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "hideApp");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -454,6 +490,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void unhideApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "unhideApp");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -462,6 +501,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void blockUninstallByPackageName(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "blockUninstallByPackageName");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -470,6 +512,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void setProfileName(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setProfileName");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -478,6 +523,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void handleOwnersRestriction(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleOwnersRestriction");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -486,6 +534,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void handleDeviceOwnerRestriction(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleDeviceOwnerRestriction");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -494,6 +545,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void configureWorkProfile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configureWorkProfile");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -502,6 +556,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void passOperationToSystemApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "passOperationToSystemApp");
+        }
         if(getApplicationManager().isPackageInstalled(Constants.SYSTEM_SERVICE_PACKAGE)) {
             CommonUtils.callSystemApp(getContext(),operation.getCode(),
                     Boolean.toString(operation.isEnabled()), null);
@@ -514,6 +571,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void restrictAccessToApplications(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "restrictAccessToApplications");
+        }
         AppRestriction appRestriction = CommonUtils.getAppRestrictionTypeAndList(operation, getResultBuilder(), getContextResources());
         String ownershipType = Preference.getString(getContext(), Constants.DEVICE_TYPE);
 
@@ -579,12 +639,18 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void setPolicyBundle(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setPolicyBundle");
+        }
         getResultBuilder().build(operation);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void setRuntimePermissionPolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setRuntimePermissionPolicy");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -593,6 +659,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void setStatusBarDisabled(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setStatusBarDisabled");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -601,6 +670,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void setScreenCaptureDisabled(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setScreenCaptureDisabled");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -609,6 +681,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void setAutoTimeRequired(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setAutoTimeRequired");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -617,6 +692,9 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public void configureCOSUProfile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configureCOSUProfile");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_error));
         operation.setOperationResponse("Operation not supported.");
         getResultBuilder().build(operation);
@@ -625,12 +703,18 @@ public class OperationManagerBYOD extends OperationManager {
 
     @Override
     public ComplianceFeature checkWorkProfilePolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkWorkProfilePolicy");
+        }
         policy.setCompliance(true);
         return policy;
     }
 
     @Override
     public ComplianceFeature checkRuntimePermissionPolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkRuntimePermissionPolicy");
+        }
         policy.setCompliance(true);
         return policy;
     }

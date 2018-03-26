@@ -67,7 +67,7 @@ import java.util.Map;
  */
 public class MessageProcessor implements APIResultCallBack {
 
-    private static final String TAG = MessageProcessor.class.getSimpleName();
+    private static final String TAG = MessageProcessor.class.getName();
 
     private static final String ERROR_STATE = "ERROR";
     private static volatile long invokedTimestamp = 0;
@@ -117,6 +117,9 @@ public class MessageProcessor implements APIResultCallBack {
      *                 and applied to the device.
      */
     private void performOperation(String response) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "performOperation: " + response);
+        }
         List<Operation> operations = new ArrayList<>();
         try {
             if (response != null) {
@@ -157,6 +160,9 @@ public class MessageProcessor implements APIResultCallBack {
      * Call the message retrieval end point of the server to get messages pending.
      */
     public void getMessages() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getMessages");
+        }
         String ipSaved = Constants.DEFAULT_HOST;
         String prefIP = Preference.getString(context.getApplicationContext(), Constants.PreferenceFlag.IP);
         if (prefIP != null) {
@@ -406,6 +412,9 @@ public class MessageProcessor implements APIResultCallBack {
     }
 
     private void startPendingInstallation() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startPendingInstallation");
+        }
         AppInstallRequest appInstallRequest = AppInstallRequestUtil.getPending(context);
         if (appInstallRequest != null) {
             ApplicationManager applicationManager = new ApplicationManager(context.getApplicationContext());
@@ -422,6 +431,9 @@ public class MessageProcessor implements APIResultCallBack {
     public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
         String responseStatus;
         String response;
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceiveAPIResult");
+        }
         if (requestCode == Constants.NOTIFICATION_REQUEST_CODE) {
             Preference.putLong(context, Constants.PreferenceFlag.LAST_SERVER_CALL, CommonUtils.currentDate().getTime());
             Intent intent = new Intent();

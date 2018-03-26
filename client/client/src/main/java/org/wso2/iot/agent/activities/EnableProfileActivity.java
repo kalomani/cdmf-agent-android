@@ -26,6 +26,8 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.support.annotation.RequiresApi;
+import android.util.Log;
+
 import org.wso2.iot.agent.services.AgentDeviceAdminReceiver;
 import org.wso2.iot.agent.utils.Constants;
 
@@ -33,11 +35,15 @@ import org.wso2.iot.agent.utils.Constants;
  * This activity is started after the provisioning is complete in {@link AgentDeviceAdminReceiver}.
  */
 public class EnableProfileActivity extends Activity {
+    private static final String TAG = EnableProfileActivity.class.getName();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
         if (savedInstanceState == null) {
             enableProfile();
             startEnrollment();
@@ -46,6 +52,9 @@ public class EnableProfileActivity extends Activity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void enableProfile() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "enableProfile");
+        }
         DevicePolicyManager manager =
                 (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName componentName = AgentDeviceAdminReceiver.getComponentName(this);
@@ -56,6 +65,9 @@ public class EnableProfileActivity extends Activity {
     }
 
     private void startEnrollment(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startEnrollment");
+        }
         Intent intent = new Intent(this, ServerConfigsActivity.class);
         startActivity(intent);
     }

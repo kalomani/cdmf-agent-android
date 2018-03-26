@@ -19,19 +19,26 @@ package org.wso2.iot.agent.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import org.wso2.iot.agent.R;
 import org.wso2.iot.agent.api.DeviceInfo;
+import org.wso2.iot.agent.utils.Constants;
 
 /**
  * Activity which displays device information.
  */
 public class DisplayDeviceInfoActivity extends Activity {
+	private static final String TAG = DisplayDeviceInfoActivity.class.getName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onCreate");
+		}
+
 		setContentView(R.layout.activity_display_device_info);
 		DeviceInfo deviceInfo = new DeviceInfo(this.getApplicationContext());
 		TextView deviceId = (TextView) findViewById(R.id.txtId);

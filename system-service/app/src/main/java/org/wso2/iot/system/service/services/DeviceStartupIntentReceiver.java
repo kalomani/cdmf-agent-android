@@ -41,7 +41,9 @@ public class DeviceStartupIntentReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(final Context context, Intent intent) {
-
+		if (Constants.DEBUG_MODE_ENABLED) {
+			Log.d(TAG, "onReceive");
+		}
 		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
 			boolean isAvailableDownloadReference = Preference.getBoolean(context, context.getResources().getString(R.string.download_manager_reference_id_available));
             //Log.d(TAG, "Download manager reference id availability : "+isAvailableDownloadReference);

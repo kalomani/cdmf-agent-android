@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class PolicyRevokeHandler {
 
-    private static final String TAG = PolicyRevokeHandler.class.getSimpleName();
+    private static final String TAG = PolicyRevokeHandler.class.getName();
     private Context context;
     private DevicePolicyManager devicePolicyManager;
     private Resources resources;
@@ -71,7 +71,9 @@ public class PolicyRevokeHandler {
      */
     public void revokeExistingPolicy(org.wso2.iot.agent.beans.Operation operation)
             throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeExistingPolicy");
+        }
         if (Constants.SYSTEM_APP_ENABLED) {
             switch (operation.getCode()) {
                 case Constants.Operation.CAMERA:
@@ -192,7 +194,9 @@ public class PolicyRevokeHandler {
                     if (isUnknownSourcesDisallowed) {
                         Preference.putBoolean(context,
                                 Constants.PreferenceFlag.DISALLOW_UNKNOWN_SOURCES, false);
-                        CommonUtils.allowUnknownSourcesForProfile(context, true);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            CommonUtils.allowUnknownSourcesForProfile(context, true);
+                        }
                     }
                 case Constants.Operation.DISALLOW_MODIFY_ACCOUNTS:
                 case Constants.Operation.DISALLOW_OUTGOING_BEAM:
@@ -225,6 +229,9 @@ public class PolicyRevokeHandler {
     }
 
     private void revokeWorkProfile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeWorkProfile");
+        }
         String enableSystemAppsData;
         String hideSystemAppsData;
         String unhideSystemAppsData;
@@ -273,6 +280,9 @@ public class PolicyRevokeHandler {
     }
 
     private void uninstallGooglePlayApps(String packageName) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "uninstallGooglePlayApps");
+        }
         try {
             applicationManager.uninstallApplication(packageName, null);
         } catch (AndroidAgentException e) {
@@ -282,6 +292,9 @@ public class PolicyRevokeHandler {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setApplicationHidden(String packageName, boolean isHidden) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setApplicationHidden");
+        }
         if (devicePolicyManager.isProfileOwnerApp(Constants.AGENT_PACKAGE) ||
                 devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE)) {
             devicePolicyManager.setApplicationHidden(deviceAdmin, packageName, isHidden);
@@ -294,6 +307,9 @@ public class PolicyRevokeHandler {
      * @param operation - Operation object.
      */
     private void revokeCameraPolicy(org.wso2.iot.agent.beans.Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeCameraPolicy");
+        }
         if (!operation.isEnabled()) {
             devicePolicyManager.setCameraDisabled(deviceAdmin, false);
         }
@@ -305,7 +321,9 @@ public class PolicyRevokeHandler {
      * @param operation - Operation object.
      */
     private void revokeInstallAppPolicy(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeInstallAppPolicy");
+        }
         String appIdentifier = null;
 
         try {
@@ -332,7 +350,9 @@ public class PolicyRevokeHandler {
      */
     private void revokeAppRestrictionPolicy(org.wso2.iot.agent.beans.Operation operation)
             throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeAppRestrictionPolicy");
+        }
         AppRestriction appRestriction =
                 CommonUtils.getAppRestrictionTypeAndList(operation, null, null);
         if (Constants.AppRestriction.BLACK_LIST.equals(appRestriction.getRestrictionType()) ||
@@ -369,6 +389,9 @@ public class PolicyRevokeHandler {
      * @return appInstalled - App installed status.
      */
     private boolean isAppInstalled(String appIdentifier) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isAppInstalled");
+        }
         boolean appInstalled = false;
         ArrayList<DeviceAppInfo> apps = new ArrayList<>(applicationManager.getInstalledApps().values());
         for (DeviceAppInfo appInfo : apps) {
@@ -386,7 +409,9 @@ public class PolicyRevokeHandler {
      * @param operation - Operation object.
      */
     private void revokeEncryptPolicy(Operation operation) {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeEncryptPolicy");
+        }
         boolean encryptStatus = (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.
                 ENCRYPTION_STATUS_UNSUPPORTED && (devicePolicyManager.getStorageEncryptionStatus() == DevicePolicyManager.
                 ENCRYPTION_STATUS_ACTIVE || devicePolicyManager.getStorageEncryptionStatus() == DevicePolicyManager.
@@ -401,6 +426,9 @@ public class PolicyRevokeHandler {
      * Revokes screen lock password policy on the device.
      */
     private void revokePasswordPolicy() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokePasswordPolicy");
+        }
         devicePolicyManager.setPasswordQuality(deviceAdmin, DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
         devicePolicyManager.setMaximumFailedPasswordsForWipe(deviceAdmin, 0);
         devicePolicyManager.setPasswordExpirationTimeout(deviceAdmin, 0);
@@ -416,6 +444,9 @@ public class PolicyRevokeHandler {
      * @param operation - Operation object.
      */
     private void revokeWifiPolicy(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeWifiPolicy");
+        }
         String ssid = null;
 
         try {
@@ -439,6 +470,9 @@ public class PolicyRevokeHandler {
      * @param operation - Operation object.
      */
     private void revokeOwnersRestrictionPolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeOwnerRestrictionPolicy");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE) ||
                     devicePolicyManager.isProfileOwnerApp(Constants.AGENT_PACKAGE)) {
@@ -448,10 +482,16 @@ public class PolicyRevokeHandler {
     }
 
     private String getPermissionConstantValue(String key) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getPermissionConstantValue");
+        }
         return context.getString(resources.getIdentifier(key,"string",context.getPackageName()));
     }
 
     private void revokeDeviceOwnerRestrictionPolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeDeviceOwnerRestrictionPolicy");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE)) {
                 devicePolicyManager.clearUserRestriction(deviceAdmin,getPermissionConstantValue(operation.getCode()));
@@ -460,6 +500,9 @@ public class PolicyRevokeHandler {
     }
 
     private void revokeScreenCaptureDisabledPolicy() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeScreenCaptureDisabledPolicy");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE) ||
                     devicePolicyManager.isProfileOwnerApp(Constants.AGENT_PACKAGE)) {
@@ -471,6 +514,9 @@ public class PolicyRevokeHandler {
     }
 
     private void revokeStatusBarDisabledPolicy() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeStatusBarDisabledPolicy");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE)) {
                 devicePolicyManager.setStatusBarDisabled(deviceAdmin, false);
@@ -479,6 +525,9 @@ public class PolicyRevokeHandler {
     }
 
     private void revokeAutoTimeRestrictionPolicy() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeAutoTimeRestrictionPolicy");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE)) {
                 devicePolicyManager.setAutoTimeRequired(deviceAdmin, false);
@@ -487,6 +536,9 @@ public class PolicyRevokeHandler {
     }
 
     private void revokeCOSUProfilePolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeCOSUProfilePolicy");
+        }
         try {
             JSONObject COSUProfileData = new JSONObject(operation.getPayLoad().toString());
             int lockDownTime = Preference.getInt(context, Constants.PreferenceCOSUProfile.FREEZE_TIME);
@@ -506,6 +558,9 @@ public class PolicyRevokeHandler {
     }
 
     private void revokeRunTimePermissionPolicyOperation() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "revokeRunTimePermissionPolicyOperation");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (devicePolicyManager.isDeviceOwnerApp(Constants.AGENT_PACKAGE) ||
                     devicePolicyManager.isProfileOwnerApp(Constants.AGENT_PACKAGE)) {

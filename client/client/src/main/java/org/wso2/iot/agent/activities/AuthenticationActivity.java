@@ -113,7 +113,7 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	private int kioskExit;
 
 	private DeviceInfo deviceInfo;
-	private static final String TAG = AuthenticationActivity.class.getSimpleName();
+	private static final String TAG = AuthenticationActivity.class.getName();
 	private static final int ACTIVATION_REQUEST = 47;
     private static final int PERMISSION_REQUEST = 48;
 	private static final String[] SUBSCRIBED_API = new String[]{"android"};
@@ -123,6 +123,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onCreate");
+		}
 		context = this;
 		devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -325,6 +328,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	@Override
 	protected void onResume(){
 		super.onResume();
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onResume");
+        }
 		if (progressDialog != null) {
 			progressDialog.show();
 		}
@@ -333,6 +339,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	@Override
 	protected void onPause(){
 		super.onPause();
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onPause");
+        }
 		if (progressDialog != null && progressDialog.isShowing()) {
 			progressDialog.dismiss();
 		} else {
@@ -342,6 +351,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 
 	@Override
 	protected void onDestroy(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onDestroy");
+        }
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 		super.onDestroy();
 		CommonDialogUtils.stopProgressDialog(progressDialog);
@@ -398,6 +410,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	};
 
 	private void proceedToAuthentication() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "proceedToAuthentication");
+        }
 		if (etDomain.getText() != null && !etDomain.getText().toString().trim().isEmpty()) {
 			usernameVal +=
 					getResources().getString(R.string.intent_extra_at) +
@@ -412,6 +427,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void obtainTenantDomain(String username, String password) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "obtainTenantDomain");
+        }
 		// Check network connection availability before calling the API.
 		currentTenant = null;
 		if (CommonUtils.isNetworkAvailable(context)) {
@@ -479,6 +497,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 *
 	 */
 	private void startDeviceAdminPrompt() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startDeviceAdminPrompt");
+        }
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP &&
 				devicePolicyManager.isProfileOwnerApp(getPackageName())) {
 			checkManifestPermissions();
@@ -503,6 +524,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Start authentication process.
 	 */
 	private void startAuthentication() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "startAuthentication");
+        }
 		Preference.putString(context, Constants.DEVICE_TYPE, deviceType);
 
 		// Check network connection availability before calling the API.
@@ -553,6 +577,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * @param clientSecret client secret value to access APIs.
 	 */
 	private void initializeIDPLib(String clientKey, String clientSecret) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "initializeIDPLib");
+        }
 		String serverIP = Constants.DEFAULT_HOST;
 		String prefIP = Preference.getString(AuthenticationActivity.this, Constants.PreferenceFlag.IP);
 
@@ -604,6 +631,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onActivityResult");
+        }
         if (requestCode == ACTIVATION_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
 				checkManifestPermissions();
@@ -623,6 +653,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public void onAPIAccessReceive(String status) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onAPIAccessReceive");
+        }
 		if (status != null) {
 			if (status.trim().equals(Constants.Status.SUCCESSFUL)) {
 				CommonDialogUtils.stopProgressDialog(progressDialog);
@@ -668,6 +701,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	private void getLicense() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getLicense");
+        }
         boolean isAgreed = Preference.getBoolean(context, Constants.PreferenceFlag.IS_AGREED);
         deviceType = Preference.getString(context, Constants.DEVICE_TYPE);
 
@@ -723,6 +759,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Retriever license agreement details from the server.
 	 */
 	private void getLicenseFromServer() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getLicenceFromServer");
+        }
 		String ipSaved = Constants.DEFAULT_HOST;
 		String prefIP = Preference.getString(context.getApplicationContext(), Constants.PreferenceFlag.IP);
 		if (prefIP != null) {
@@ -748,6 +787,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Retriever configurations from the server.
 	 */
 	private void checkManifestPermissions() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "checkManifestPermissions");
+        }
 		if (ActivityCompat.checkSelfPermission(AuthenticationActivity.this, android.Manifest.permission.READ_PHONE_STATE)
 				!= PackageManager.PERMISSION_GRANTED) {
 
@@ -776,6 +818,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	public void onRequestPermissionsResult(int requestCode,
 										   @NonNull String[] permissions,
 										   @NonNull int[] grantResults) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onRequestPermissionResult");
+        }
         if (requestCode == PERMISSION_REQUEST) {
             NotificationManager notificationManager = (NotificationManager) context
                     .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -810,6 +855,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Retriever configurations from the server.
 	 */
 	private void getConfigurationsFromServer() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getConfigurationsFromServer");
+        }
 		final OnCancelListener cancelListener = new OnCancelListener() {
 
 			@Override
@@ -854,6 +902,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 
 	@Override
 	public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onReceiveAPIResult");
+        }
 		if (requestCode == Constants.LICENSE_REQUEST_CODE) {
 			manipulateLicenseResponse(result);
 		} else if (requestCode == Constants.CONFIGURATION_REQUEST_CODE){
@@ -869,6 +920,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * @param result the result of the dynamic client request
 	 */
 	private void manipulateDynamicClientResponse(Map<String, String> result) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "manipulateDynamicClientResponse");
+        }
 		String responseStatus;
 		if (result != null) {
 			responseStatus = result.get(Constants.STATUS);
@@ -899,6 +953,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * @param result the result of the configuration request
 	 */
 	private void manipulateConfigurationResponse(Map<String, String> result) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "manipulateConfigurationResponse");
+        }
 		boolean proceedNext = true;
 		String responseStatus;
 		CommonDialogUtils.stopProgressDialog(progressDialog);
@@ -991,6 +1048,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void setDefaultNotifier(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "setDefaultNotifier");
+        }
 		Preference.putString(context, Constants.PreferenceFlag.NOTIFIER_TYPE, Constants.NOTIFIER_LOCAL);
 		Preference.putInt(context, getResources().getString(R.string.shared_pref_frequency),
 				Constants.DEFAULT_INTERVAL);
@@ -1003,6 +1063,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * @param result the result of the license agreement request
 	 */
 	private void manipulateLicenseResponse(Map<String, String> result) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "manipulateLicenseResponse");
+        }
 		String responseStatus;
 		CommonDialogUtils.stopProgressDialog(progressDialog);
 
@@ -1040,6 +1103,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void showNoSystemAppDialog(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showNoSystemAppDialog");
+        }
 		AlertDialog.Builder alertDialog =
 				CommonDialogUtils.getAlertDialogWithNeutralButtonAndTitle(context,
 						getResources().getString(R.string.dialog_title_system_app_required),
@@ -1050,6 +1116,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void showErrorMessage(String message, String title) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showErrorMessage");
+        }
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(message);
 		builder.setTitle(title);
@@ -1073,6 +1142,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * @param title   Title of the license.
 	 */
 	private void showAgreement(final String licenseText, final String title) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showAgreement");
+        }
 		AuthenticationActivity.this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -1130,6 +1202,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void loadPinCodeActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadPinCodeActivity");
+        }
 		Intent intent = new Intent(AuthenticationActivity.this, PinCodeActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra(Constants.USERNAME, usernameVal);
@@ -1138,6 +1213,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void loadRegistrationActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadRegistrationActivity");
+        }
 		Intent intent = new Intent(AuthenticationActivity.this, RegistrationActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra(Constants.USERNAME, usernameVal);
@@ -1146,6 +1224,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	}
 
 	private void cancelEntry() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "cancelEntry");
+        }
 		Preference.putBoolean(context, Constants.PreferenceFlag.IS_AGREED, false);
 		Preference.putBoolean(context, Constants.PreferenceFlag.REGISTERED, false);
 		Preference.putString(context, Constants.PreferenceFlag.IP, null);
@@ -1161,6 +1242,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * entered.
 	 */
 	private void enableSubmitIfReady() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "enableSubmitIfReady");
+        }
 
 		boolean isReady = false;
 
@@ -1182,6 +1266,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onKeyDown");
+        }
 		if (keyCode == KeyEvent.KEYCODE_BACK && !isReLogin) {
 			finish();
 			return true;
@@ -1204,6 +1291,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Shows enrollment failed error.
 	 */
 	private void showEnrollmentFailedErrorMessage(String message) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showEnrollmentFailedErrorMessage");
+        }
 		CommonDialogUtils.stopProgressDialog(progressDialog);
 		final String messageDescription;
 		String descriptionText = getResources().getString(
@@ -1232,6 +1322,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Shows internal server error message for authentication.
 	 */
 	private void showInternalServerErrorMessage() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showInternalServerErrorMessage");
+        }
 		CommonDialogUtils.stopProgressDialog(progressDialog);
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -1253,6 +1346,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Shows credentials error message for authentication.
 	 */
 	private void showAuthenticationError(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showAuthenticationError");
+        }
 		CommonDialogUtils.stopProgressDialog(progressDialog);
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -1270,6 +1366,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * Shows common error message for authentication.
 	 */
 	private void showAuthCommonErrorMessage() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "showAuthCommonErrorMessage");
+        }
 		CommonDialogUtils.stopProgressDialog(progressDialog);
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -1291,6 +1390,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * This method is used to retrieve consumer-key and consumer-secret.
 	 */
 	private void getClientCredentials() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getClientCredentials");
+        }
 		String ipSaved = Constants.DEFAULT_HOST;
 		String prefIP = Preference.getString(context.getApplicationContext(),
 				Constants.PreferenceFlag.IP);
@@ -1345,6 +1447,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	 * ownership type.
 	 */
 	private void loadNextActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadNextActivity");
+        }
 		if (Constants.OWNERSHIP_BYOD.equalsIgnoreCase(deviceType)) {
 			loadPinCodeActivity();
 		} else {
@@ -1355,6 +1460,9 @@ public class AuthenticationActivity extends AppCompatActivity implements APIAcce
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Override
 	public void onAuthenticated(boolean status, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onAuthenticated");
+        }
 		if (requestCode == Constants.AUTHENTICATION_REQUEST_CODE) {
 			if (status &&
 					org.wso2.iot.agent.proxy.utils.Constants.Authenticator.AUTHENTICATOR_IN_USE.

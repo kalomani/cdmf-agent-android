@@ -24,9 +24,16 @@ import android.content.Intent;
 import android.os.UserHandle;
 import android.util.Log;
 
+import org.wso2.iot.system.service.utils.Constants;
+
 public class ServiceDeviceAdminReceiver extends DeviceAdminReceiver {
+    private static final String TAG = ServiceDeviceAdminReceiver.class.getName();
+
     @Override
     public void onEnabled(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onEnabled");
+        }
         // TODO Auto-generated method stub
         super.onEnabled(context, intent);
         Log.i("Device Admin", "Enabled");
@@ -34,12 +41,18 @@ public class ServiceDeviceAdminReceiver extends DeviceAdminReceiver {
 
     @Override
     public String onDisableRequested(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onDisableRequested");
+        }
         // TODO Auto-generated method stub
         return "Admin disable Requested";
     }
 
     @Override
     public void onDisabled(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onDisabled");
+        }
         // TODO Auto-generated method stub
         super.onDisabled(context, intent);
         Log.i("Device Admin", "Disables");
@@ -48,6 +61,9 @@ public class ServiceDeviceAdminReceiver extends DeviceAdminReceiver {
 
     @Override
     public void onPasswordChanged(Context context, Intent intent, UserHandle userHandle) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onPasswordChanged");
+        }
         // TODO Auto-generated method stub
         super.onPasswordChanged(context, intent, userHandle);
         Log.i("Device Admin", "Password Changed");

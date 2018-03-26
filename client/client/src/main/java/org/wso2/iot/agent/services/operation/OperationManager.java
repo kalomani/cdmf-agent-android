@@ -104,7 +104,7 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     private ApplicationManager applicationManager;
     private NotificationService notificationService;
 
-    private static final String TAG = OperationManager.class.getSimpleName();
+    private static final String TAG = OperationManager.class.getName();
 
     private static final String APP_INFO_TAG_NAME = "name";
     private static final String APP_INFO_TAG_PACKAGE = "package";
@@ -207,6 +207,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void getDeviceInfo(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getDeviceInfo");
+        }
         DeviceInfoPayload deviceInfoPayload = new DeviceInfoPayload(context);
         deviceInfoPayload.build();
         String replyPayload = deviceInfoPayload.getDeviceInfoPayload();
@@ -224,6 +227,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void getLocationInfo(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLocationInfo");
+        }
         DeviceLocation deviceLocation = new DeviceLocation(context);
         Location currentLocation = deviceLocation.getCurrentLocation();
         Address currentAddress = deviceLocation.getCurrentAddress();
@@ -279,6 +285,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void getApplicationList(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getApplicationList");
+        }
         ArrayList<DeviceAppInfo> apps = new ArrayList<>(appList.getInstalledApps().values());
         JSONArray result = new JSONArray();
         RuntimeInfo runtimeInfo = new RuntimeInfo(context);
@@ -314,6 +323,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
 
     @Override
     public void wipeDevice(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "wipeDevice");
+        }
         String inputPin = null;
         String savedPin = Preference.getString(getContext(), getContextResources().getString(R.string.shared_pref_pin));
         JSONObject result = new JSONObject();
@@ -372,6 +384,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void ringDevice(org.wso2.iot.agent.beans.Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "ringDevice");
+        }
         operation.setStatus(resources.getString(R.string.operation_value_completed));
         resultBuilder.build(operation);
         Intent intent = new Intent(context, AlertActivity.class);
@@ -393,6 +408,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @throws AndroidAgentException - AndroidAgentException.
      */
     public void uploadFile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "uploadFile");
+        }
         operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
         Intent upload = new Intent(context, FileUploadService.class);
         upload.putExtra(resources.getString(R.string.intent_extra_operation_object), operation);
@@ -410,6 +428,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @throws AndroidAgentException - AndroidAgentException.
      */
     public void downloadFile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "downloadFile");
+        }
         operation.setStatus(resources.getString(R.string.operation_value_progress));
         Intent upload = new Intent(context, FileDownloadService.class);
         upload.putExtra(resources.getString(R.string.intent_extra_operation_object), operation);
@@ -426,6 +447,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - operation object
      */
     public void setResponse(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setResponse");
+        }
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putInt(resources.getString(R.string.FILE_UPLOAD_ID), operation.getId());
         editor.putString(resources.getString(R.string.FILE_UPLOAD_STATUS), operation.getStatus());
@@ -444,7 +468,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
         String password = null;
         WifiProfile wifiProfile = null;
         final JSONObject result = new JSONObject();
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configureWifi");
+        }
         try {
             JSONObject wifiData = new JSONObject(operation.getPayLoad().toString());
 
@@ -528,6 +554,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void disableCamera(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "disableCamera");
+        }
         boolean camFunc = operation.isEnabled();
         operation.setStatus(resources.getString(R.string.operation_value_completed));
         resultBuilder.build(operation);
@@ -543,6 +572,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void muteDevice(org.wso2.iot.agent.beans.Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "muteDevice");
+        }
         operation.setStatus(resources.getString(R.string.operation_value_completed));
         resultBuilder.build(operation);
 
@@ -562,7 +594,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
         String appUrl;
         String title;
         String operationType;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "manageWebClip");
+        }
         try {
             JSONObject webClipData = new JSONObject(operation.getPayLoad().toString());
             appUrl = webClipData.getString(resources.getString(R.string.intent_extra_identity));
@@ -680,7 +714,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void blacklistApps(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "blacklistApps");
+        }
     }
 
     /**
@@ -689,6 +725,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void uninstallApplication(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "uninstallApplication");
+        }
         String packageName;
         String type;
         String schedule = null;
@@ -739,6 +778,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void rebootDevice(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "rebootDevice");
+        }
         JSONObject result = new JSONObject();
         try {
             boolean isRebootPossible = Constants.SYSTEM_APP_ENABLED
@@ -783,6 +825,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void upgradeFirmware(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "updateFirmware");
+        }
         JSONObject result = new JSONObject();
         Preference.putString(context, resources.getString(R.string.pref_key_schedule), operation.getPayLoad().toString());
         try {
@@ -818,7 +863,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      */
     public void executeShellCommand(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
         JSONObject result = new JSONObject();
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "executeShellCommand");
+        }
         try {
             String status = resources.getString(R.string.shared_pref_default_status);
             result.put(resources.getString(R.string.operation_status), status);
@@ -860,6 +907,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void lockDevice(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "lockDevice");
+        }
         operation.setStatus(resources.getString(R.string.operation_value_completed));
         resultBuilder.build(operation);
         JSONObject inputData;
@@ -906,6 +956,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     }
 
     public void enableHardLock(String message, Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enableHardLock");
+        }
         String payload = "false";
         if (getApplicationManager().isPackageInstalled(Constants.SYSTEM_SERVICE_PACKAGE)) {
             operation.setStatus(resources.getString(R.string.operation_value_completed));
@@ -921,9 +974,12 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     /**
      * Unlock the device.
      *
-     * @param operation - Operabtion object.
+     * @param operation - Operation object.
      */
     public void unlockDevice(org.wso2.iot.agent.beans.Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "unlockDevice");
+        }
         if (getApplicationManager().isPackageInstalled(Constants.SYSTEM_SERVICE_PACKAGE)) {
             boolean isLocked = Preference.getBoolean(context, Constants.IS_LOCKED);
             if (isLocked) {
@@ -948,6 +1004,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void installGooglePlayApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installGooglePlayApp");
+        }
         String packageName;
         try {
             JSONObject appData = new JSONObject(operation.getPayLoad().toString());
@@ -976,6 +1035,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void configureVPN(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configureVPN");
+        }
         String serverAddress = null;
         JSONObject result = new JSONObject();
 
@@ -1018,6 +1080,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void getLogcat(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLogcat");
+        }
         String logLevel = Constants.LogPublisher.LOG_LEVEL;
         if (Constants.SYSTEM_APP_ENABLED) {
             try {
@@ -1047,6 +1112,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     }
 
     public static String getOperationResponseFromLogcat(Context context, String logcat) throws IOException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getOperationResponseFromLogcat");
+        }
         File logcatFile = new File(logcat);
         if (logcatFile.exists() && logcatFile.canRead()) {
             DeviceInfo deviceInfo = new DeviceInfo(context);
@@ -1095,6 +1163,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
 
     @Override
     public void passOperationToSystemApp(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "passOperationToSystemApp");
+        }
         if (getApplicationManager().isPackageInstalled(Constants.SYSTEM_SERVICE_PACKAGE)) {
             CommonUtils.callSystemApp(getContext(), operation.getCode(),
                     Boolean.toString(operation.isEnabled()), null);
@@ -1111,6 +1182,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @param operation - Operation object.
      */
     public void displayNotification(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "displayNotificaiton");
+        }
         try {
 
             operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
@@ -1153,6 +1227,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      *
      */
     public void connectToRemoteSession(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "connectToRemoteSession");
+        }
         try {
             operation.setStatus(getContextResources().getString(R.string.operation_value_progress));
             if (operation.getPayLoad() != null) {
@@ -1187,6 +1264,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @throws TransportHandlerException - Throws when session connection has an error
      */
     public void processRemoteShell(org.wso2.iot.agent.beans.Operation operation) throws TransportHandlerException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "processRemoteShell");
+        }
         RemoteShellExecutor.getInstance(context).executeCommand(operation);
     }
 
@@ -1197,9 +1277,12 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @throws TransportHandlerException - Throws when session connection has an error
      * @throws JSONException             - Throws when error occurs while parsing the payload
      */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    // @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void screenCapture(org.wso2.iot.agent.beans.Operation operation) throws TransportHandlerException,
             JSONException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "screenCapture");
+        }
         String action;
         int maxHeight = Constants.DEFAULT_SCREEN_CAPTURE_IMAGE_HEIGHT;
         int maxWidth = Constants.DEFAULT_SCREEN_CAPTURE_IMAGE_WIDTH;
@@ -1220,18 +1303,27 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
                         Log.e(TAG, "Cannot parse the screen capture height and width");
                     }
                     // We need to unlock device to start the screen sharing
-                    if (!powerManager.isScreenOn()) {
-                        PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
-                                | PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
-                        TempWakeLock.acquire();
-                        TempWakeLock.release();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                        if (!powerManager.isInteractive()) {
+                            PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
+                            TempWakeLock.acquire();
+                            TempWakeLock.release();
+                        }
+                    } else {
+                        if (!powerManager.isScreenOn()) {
+                            PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK
+                                    | PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
+                            TempWakeLock.acquire();
+                            TempWakeLock.release();
+                        }
                     }
                     if (Constants.SYSTEM_APP_ENABLED) {
-                        Intent i =
-                                new Intent(context, ScreenSharingService.class)
-                                        .putExtra(ScreenSharingService.EXTRA_RESULT_CODE, -1)
+                        Intent i = new Intent(context, ScreenSharingService.class)
                                         .putExtra(Constants.MAX_WIDTH, maxWidth)
                                         .putExtra(Constants.MAX_HEIGHT, maxHeight);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            i.putExtra(ScreenSharingService.EXTRA_RESULT_CODE, -1);
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             context.startForegroundService(i);
                         } else {
@@ -1270,6 +1362,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      */
     public void processInputInject(org.wso2.iot.agent.beans.Operation operation) throws TransportHandlerException,
             JSONException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "processInputInject");
+        }
         if (Constants.SYSTEM_APP_ENABLED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (ScreenSharingService.isScreenShared) {
@@ -1297,6 +1392,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @return policy - ComplianceFeature object.
      */
     public ComplianceFeature checkCameraPolicy(Operation operation, ComplianceFeature policy) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkCameraPolicy");
+        }
         boolean cameraStatus = getDevicePolicyManager().getCameraDisabled(getCdmDeviceAdmin());
 
         if ((operation.isEnabled() && !cameraStatus) || (!operation.isEnabled() && cameraStatus)) {
@@ -1317,7 +1415,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     public ComplianceFeature checkInstallAppPolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
         String appIdentifier = null;
         String name = null;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkInstallAppPolicy");
+        }
         try {
             JSONObject appData = new JSONObject(operation.getPayLoad().toString());
 
@@ -1352,7 +1452,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     public ComplianceFeature checkUninstallAppPolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
         String appIdentifier = null;
         String name = null;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkUninstallAppPolicy");
+        }
         try {
             JSONObject appData = new JSONObject(operation.getPayLoad().toString());
 
@@ -1385,6 +1487,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @return appInstalled - App installed status.
      */
     private boolean isAppInstalled(String appIdentifier) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isAppInstalled");
+        }
         boolean appInstalled = false;
         ArrayList<DeviceAppInfo> apps = new ArrayList<>(getApplicationManager().getInstalledApps().values());
         for (DeviceAppInfo appInfo : apps) {
@@ -1402,6 +1507,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @return policy - ComplianceFeature object.
      */
     public ComplianceFeature checkEncryptPolicy(Operation operation, ComplianceFeature policy) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkEncryptPolicy");
+        }
         boolean encryptStatus = (getDevicePolicyManager().getStorageEncryptionStatus() != getDevicePolicyManager().
                 ENCRYPTION_STATUS_UNSUPPORTED && getDevicePolicyManager().
                 getStorageEncryptionStatus() != getDevicePolicyManager().ENCRYPTION_STATUS_INACTIVE);
@@ -1422,6 +1530,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @return policy - ComplianceFeature object.
      */
     public ComplianceFeature checkPasswordPolicy(ComplianceFeature policy) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkPasswordPolicy");
+        }
         if (getDevicePolicyManager().isActivePasswordSufficient()) {
             policy.setCompliance(true);
         } else {
@@ -1439,7 +1550,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      */
     public ComplianceFeature checkWifiPolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
         String ssid = null;
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkWifiPolicy");
+        }
         try {
             JSONObject wifiData = new JSONObject(operation.getPayLoad().toString());
             if (!wifiData.isNull(getContextResources().getString(R.string.intent_extra_ssid))) {
@@ -1467,7 +1580,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      * @throws AndroidAgentException
      */
     public ComplianceFeature checkAppRestrictionPolicy(Operation operation, ComplianceFeature policy) throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkAppRestrictionPolicy");
+        }
         AppRestriction appRestriction =
                 CommonUtils.getAppRestrictionTypeAndList(operation, null, null);
         List<String> installedAppPackages = CommonUtils.getInstalledAppPackages(getContext());
@@ -1512,6 +1627,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
     }
 
     public void setPasswordPolicy(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setPasswordPolicy");
+        }
         int specialChars = 1;
         boolean isAlphanumeric = false, isSimple = false, isComplexCharactorsNeeded = false;
 
@@ -1634,6 +1752,9 @@ public abstract class OperationManager implements APIResultCallBack, VersionBase
      */
     @Override
     public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceiveAPIResult");
+        }
         String responseStatus;
         String response;
         if (requestCode == Constants.DEVICE_INFO_REQUEST_CODE) {

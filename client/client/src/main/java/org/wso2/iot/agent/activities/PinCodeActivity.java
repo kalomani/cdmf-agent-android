@@ -26,6 +26,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,6 +43,7 @@ import org.wso2.iot.agent.utils.Preference;
  * Activity which handles PIN code setting/editing.
  */
 public class PinCodeActivity extends AppCompatActivity {
+	private static final String TAG = PinCodeActivity.class.getName();
 	private EditText evPin;
 	private EditText evReTypePin;
 	private EditText evOldPin;
@@ -56,7 +58,11 @@ public class PinCodeActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onCreate");
+		}
+
 		setContentView(R.layout.activity_pin_code);
 		context = PinCodeActivity.this;
 		Bundle extras = getIntent().getExtras();
@@ -172,6 +178,9 @@ public class PinCodeActivity extends AppCompatActivity {
 	};
 
 	private void savePin() {
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "savePin");
+		}
 		if (AlreadyRegisteredActivity.class.getSimpleName().equals(fromActivity)) {
 			String pin = Preference.getString(context, getResources().getString(R.string.shared_pref_pin));
 			if (!evOldPin.getText().toString().trim().equals(pin.trim())) {
@@ -202,6 +211,9 @@ public class PinCodeActivity extends AppCompatActivity {
 	}
 
 	private void enableSubmitIfReady() {
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "enableSubmitIfReady");
+		}
 
 		boolean isReady = false;
 
@@ -223,6 +235,9 @@ public class PinCodeActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (Constants.DEBUG_MODE_ENABLED){
+			Log.d(TAG, "onKeyDown");
+		}
 		if (keyCode == KeyEvent.KEYCODE_BACK &&
 				AlreadyRegisteredActivity.class.getSimpleName().equals(fromActivity)) {
 			Intent intent = new Intent(PinCodeActivity.this, AlreadyRegisteredActivity.class);

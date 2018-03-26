@@ -38,11 +38,14 @@ import org.wso2.iot.system.service.utils.Preference;
  */
 public class NetworkConnectivityStatusReceiver extends BroadcastReceiver {
 
-    private static final String TAG = NetworkConnectivityStatusReceiver.class.getSimpleName();
+    private static final String TAG = NetworkConnectivityStatusReceiver.class.getName();
 
     @Override
     @SuppressWarnings("deprecation")
     public void onReceive(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
 
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifi = null;

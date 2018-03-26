@@ -36,7 +36,7 @@ import org.wso2.iot.system.service.utils.Constants;
  */
 public class NetworkConnectedReceiver extends BroadcastReceiver {
 
-    private static final String TAG = "NetworkConReceiver";
+    private static final String TAG = NetworkConnectedReceiver.class.getName();
     private static final String PREFERENCES = "system_service_pref";
     private static final String AGENT_HAS_BEEN_CALLED = "agent_has_been_called";
 
@@ -46,6 +46,9 @@ public class NetworkConnectedReceiver extends BroadcastReceiver {
      * @return - Connection status.
      */
     private static boolean isConnected(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isConnected");
+        }
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = null;
@@ -57,7 +60,9 @@ public class NetworkConnectedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
         Log.d(TAG, "Entered OnReceive in NetworkConnectedReceiver");
 
         //Skipping non admin users

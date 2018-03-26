@@ -20,6 +20,7 @@ package org.wso2.iot.agent;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -36,7 +37,8 @@ import org.wso2.iot.agent.utils.Constants;
  * Activity which handles authentication errors.
  */
 public class AuthenticationErrorActivity extends Activity {
-	private String registrationId;
+    private static String TAG = AuthenticationErrorActivity.class.getName();
+    private String registrationId;
 	private Button btnTryAgain;
 	private static final int TAG_BTN_TRY_AGAIN = 0;
 	private static final int TAG_BTN_UNREGISTER = 1;
@@ -46,6 +48,9 @@ public class AuthenticationErrorActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
 		setContentView(R.layout.activity_authentication_error);
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -102,6 +107,9 @@ public class AuthenticationErrorActivity extends Activity {
 	 * Retry authentication.
 	 */
 	private void tryAgain() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "tryAgain");
+        }
 		if (Constants.AUTO_ENROLLMENT_BACKGROUND_SERVICE_ENABLED == false) {
 			Intent intent = new Intent(AuthenticationErrorActivity.this, AuthenticationActivity.class);
 			intent.putExtra(getResources().getString(R.string.intent_extra_from_activity),
@@ -115,6 +123,9 @@ public class AuthenticationErrorActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreateOptionsMenu");
+        }
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.authentication_error, menu);
 		return true;
@@ -122,6 +133,9 @@ public class AuthenticationErrorActivity extends Activity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onKeyDown");
+        }
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			tryAgain();
 			return true;

@@ -65,15 +65,24 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
 
     public EnrollmentService() {
         super(/*TAG*/);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
     }
 
     // Convenience method for enqueuing work in to this service.
     public static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enqueueWork");
+        }
         enqueueWork(context, EnrollmentService.class, JOB_ID, work);
     }
 
     @Override
     protected void onHandleWork(Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onHandleWork");
+        }
         context = this.getApplicationContext();
         info = new DeviceInfo(context);
         cdmDeviceAdmin = new ComponentName(this, AgentDeviceAdminReceiver.class);
@@ -86,6 +95,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
     }
 
     private void startEnrollment() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startEnrollment");
+        }
         Log.i(TAG, "EMM auto enrollment initiated.");
         if (CommonUtils.
                 isNetworkAvailable(context)) {
@@ -104,6 +116,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
 
     @Override
     public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceiveAPIResult");
+        }
         if (requestCode == Constants.CONFIGURATION_REQUEST_CODE) {
             Log.i(TAG, "EMM auto enrollment, configuration response received.");
             manipulateConfigurationResponse(result);
@@ -142,6 +157,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
     }
 
     private void finishEnrollment() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "finishEnrollment");
+        }
         Log.i(TAG, "EMM auto enrollment, finishing enrollment process.");
         String registrationId = Preference.getString(context, Constants.PreferenceFlag.REG_ID);
         if (registrationId == null || !registrationId.isEmpty()) {
@@ -169,18 +187,27 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
      * Start device admin activation request.
      */
     private void startDeviceAdminPrompt() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startDeviceAdminPrompt");
+        }
         Intent intent = new Intent(EnrollmentService.this, EnableDeviceAdminActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
     private boolean isDeviceAdminActive() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isDeviceAdminActive");
+        }
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         return devicePolicyManager != null && devicePolicyManager.isAdminActive(cdmDeviceAdmin);
     }
 
 
     private void startEvents() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startEvents");
+        }
         if(!EventRegistry.eventListeningStarted) {
             Log.i(TAG, "EMM auto enrollment, initiating events.");
             EventRegistry registerEvent = new EventRegistry(this);
@@ -192,12 +219,18 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
      * Starts server polling task.
      */
     private void startPolling() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startPolling");
+        }
         Log.i(TAG, "WSO2 IoT Agent auto enrollment, initiating task.");
         LocalNotification.startPolling(context);
     }
 
     @Override
     public void onAuthenticated(boolean authenticated, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onAuthenticated");
+        }
         Log.i(TAG, "EMM auto enrollment, authentication result received.");
         if (requestCode == Constants.AUTHENTICATION_REQUEST_CODE) {
             if (authenticated) {
@@ -210,6 +243,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
     }
 
     private void getConfigurationsFromServer() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getConfigurationFromServer");
+        }
         String ipSaved = Constants.DEFAULT_HOST;
         String prefIP = Preference.getString(context.getApplicationContext(), Constants.PreferenceFlag.IP);
         if (prefIP != null) {
@@ -236,6 +272,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
      * @param result the result of the configuration request
      */
     private void manipulateConfigurationResponse(Map<String, String> result) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "manipulateConfigurationResponse");
+        }
         String responseStatus;
         if (result != null) {
             responseStatus = result.get(Constants.STATUS);
@@ -309,12 +348,18 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
     }
 
     private void setDefaultNotifier(){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setDefaultNotifier");
+        }
         Preference.putString(context, Constants.PreferenceFlag.NOTIFIER_TYPE, Constants.NOTIFIER_LOCAL);
         Preference.putInt(context, getResources().getString(R.string.shared_pref_frequency),
                           Constants.DEFAULT_INTERVAL);
     }
 
     private void registerDevice() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "registerDevice");
+        }
         Log.i(TAG, "EMM auto enrollment, registration started.");
         String type = Preference.getString(context,
                                            context.getResources().getString(R.string.shared_pref_reg_type));
@@ -361,6 +406,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
      * to the MDM server so that it can send notifications to the device.
      */
     private void registerGCM() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "registerGCM");
+        }
         Log.i(TAG, "EMM auto enrollment, GCM registration initiated.");
         String token =  FirebaseInstanceId.getInstance().getToken();
         if(token != null) {
@@ -388,6 +436,9 @@ public class EnrollmentService extends JobIntentService implements APIResultCall
      * @throws AndroidAgentException on error
      */
     public void sendRegistrationId() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendRegistrationId");
+        }
         Log.i(TAG, "IoT Agent auto enrollment, FCM ID retrieval successful, updating enrollment");
         DeviceInfo deviceInfo = new DeviceInfo(context);
         DeviceInfoPayload deviceInfoPayload = new DeviceInfoPayload(context);

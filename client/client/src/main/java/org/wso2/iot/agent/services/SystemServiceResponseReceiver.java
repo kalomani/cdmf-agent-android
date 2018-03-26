@@ -36,6 +36,9 @@ public class SystemServiceResponseReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
         String operation = intent.getStringExtra(Constants.OPERATION_CODE);
         String code = intent.getStringExtra("code");
         String status = intent.getStringExtra("status");

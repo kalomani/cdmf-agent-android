@@ -17,6 +17,7 @@
  */
 package org.wso2.iot.agent.services.kiosk;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -40,7 +41,7 @@ import java.util.Calendar;
  * operation time.
  */
 public class KioskAlarmReceiver extends JobIntentService {
-    private String TAG = KioskAlarmReceiver.class.getSimpleName();
+    static private String TAG = KioskAlarmReceiver.class.getName();
     // Unique job ID for this service.
     private static final int JOB_ID = 99;
 
@@ -49,12 +50,18 @@ public class KioskAlarmReceiver extends JobIntentService {
     }
 
     public static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enqueueWork");
+        }
         enqueueWork(context, KioskAlarmReceiver.class, JOB_ID, work);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onHandleWork(Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onHandleWork");
+        }
         //Intent service;
         Context context = this.getApplicationContext();
         Activity currentlyLockedActivity;
@@ -84,6 +91,9 @@ public class KioskAlarmReceiver extends JobIntentService {
      */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void startAlarm(Context context, Intent intent){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startAlarm");
+        }
         enqueueWork(context, intent);
         buildAlarm(context, true, true);
         Log.d(TAG,"Starting Alarm with initial Lock operation" );
@@ -97,6 +107,9 @@ public class KioskAlarmReceiver extends JobIntentService {
      */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void buildAlarm(Context context, boolean enableLock, boolean isInitialRun){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "buildAlarm");
+        }
         AlarmManager alarmManager;
         PendingIntent pendingIntent;
         Calendar calendar;
@@ -139,6 +152,9 @@ public class KioskAlarmReceiver extends JobIntentService {
      * @return calender object with given time set.
      */
     private Calendar getCalendar(int time, boolean increaseDate) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getCalendar");
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, time / 60);
@@ -156,6 +172,9 @@ public class KioskAlarmReceiver extends JobIntentService {
      * @return current system time in minutes.
      */
     private int getCurrentTimeInMinutes(){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getCurrentTimeInMinutes");
+        }
         int hours;
         int minutes;
         Calendar calendar = Calendar.getInstance();

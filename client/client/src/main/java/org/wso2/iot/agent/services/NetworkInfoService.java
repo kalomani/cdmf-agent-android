@@ -53,7 +53,7 @@ import java.util.List;
 
 public class NetworkInfoService extends Service {
 
-    private static final String TAG = NetworkInfoService.class.getSimpleName();
+    private static final String TAG = NetworkInfoService.class.getName();
 
     private static int cellSignalStrength = 99; // Invalid signal strength is represented with 99.
     private static ObjectMapper mapper;
@@ -116,6 +116,9 @@ public class NetworkInfoService extends Service {
     }
 
     protected void foreground() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "foreground");
+        }
         // launch service in foreground
         int id = 11100;
         Log.i(TAG, "launch service in foreground");
@@ -160,6 +163,9 @@ public class NetworkInfoService extends Service {
 
     @Override
     public void onDestroy() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onDestroy");
+        }
         telephonyManager.listen(deviceNetworkStatusListener, PhoneStateListener.LISTEN_NONE);
         if (Constants.WIFI_SCANNING_ENABLED) {
             unregisterReceiver(wifiScanReceiver);
@@ -172,6 +178,9 @@ public class NetworkInfoService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onBind");
+        }
         return mBinder;
     }
 
@@ -182,6 +191,9 @@ public class NetworkInfoService extends Service {
      * @throws AndroidAgentException
      */
     public static String getNetworkStatus() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getNetworkStatus");
+        }
         if (thisInstance == null) {
             Log.e(TAG, "Service not instantiated");
             throw new AndroidAgentException(TAG + " is not started.");
@@ -233,14 +245,23 @@ public class NetworkInfoService extends Service {
     }
 
     public static int getCellSignalStrength() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getCellSignalStrength");
+        }
         return cellSignalStrength;
     }
 
     public static void setCellSignalStrength(int cellSignalStrength) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setCellSignalStrength");
+        }
         NetworkInfoService.cellSignalStrength = cellSignalStrength;
     }
 
     public static String getWifiScanResult() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getWifiScanResult");
+        }
         if (wifiScanResults != null) {
             try {
                 JSONArray scanResults = new JSONArray();
@@ -270,6 +291,9 @@ public class NetworkInfoService extends Service {
     }
 
     private int getWifiSignalStrength() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getWifiSignalStrength");
+        }
         if (wifiManager != null) {
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             return wifiInfo.getRssi();
@@ -278,6 +302,9 @@ public class NetworkInfoService extends Service {
     }
 
     private String getWifiSSID() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getWifiSSID");
+        }
         if (wifiManager != null) {
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             return wifiInfo.getSSID();
@@ -287,12 +314,18 @@ public class NetworkInfoService extends Service {
 
     private void startWifiScan() {
         if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startWifiScan");
+        }
+        if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Wifi scanning started...");
         }
         wifiManager.startScan();
     }
 
     private NetworkInfo getNetworkInfo() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getNetworkInfo");
+        }
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo();

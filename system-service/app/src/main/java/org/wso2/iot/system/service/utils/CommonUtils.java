@@ -20,9 +20,15 @@ package org.wso2.iot.system.service.utils;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
+
+import org.wso2.iot.system.service.services.NetworkConnectivityStatusReceiver;
 
 import java.util.List;
 
@@ -30,6 +36,7 @@ import java.util.List;
  * This class represents all the common functions used throughout the application.
  */
 public class CommonUtils {
+    private static final String TAG = CommonUtils.class.getName();
     /**
      * Call IoT agent app to send operation updates.
      * @param context - Application context.
@@ -38,6 +45,9 @@ public class CommonUtils {
      * @param message - Error message.
      */
     public static void callAgentApp(Context context, String operation, int operationId, String message) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "callAgentApp");
+        }
         Intent intent =  new Intent(Constants.AGENT_APP_SERVICE_NAME);
         Intent explicitIntent = createExplicitFromImplicitIntent(context, intent);
         if (explicitIntent != null) {
@@ -52,13 +62,17 @@ public class CommonUtils {
         }
         intent.setPackage(Constants.PACKAGE_NAME);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundServiceAsUser(intent, android.os.Process.myUserHandle());
+            // TODO test context.startForegroundServiceAsUser(intent, android.os.Process.myUserHandle());
+            context.startServiceAsUser(intent, android.os.Process.myUserHandle());
         } else {
             context.startServiceAsUser(intent, android.os.Process.myUserHandle());
         }
     }
 
     public static Intent createExplicitFromImplicitIntent(Context context, Intent implicitIntent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "createExplicitFromImplicitIntent");
+        }
         //Retrieve all services that can match the given intent
         PackageManager pm = context.getPackageManager();
         List<ResolveInfo> resolveInfo = pm.queryIntentServices(implicitIntent, 0);
@@ -84,6 +98,9 @@ public class CommonUtils {
     }
 
     public static void sendBroadcast(Context context, String operation, String code, String status, String payload) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendBroadcast");
+        }
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(Constants.SYSTEM_APP_ACTION_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -94,5 +111,19 @@ public class CommonUtils {
             broadcastIntent.putExtra(Constants.PAYLOAD, payload);
         }
         context.sendBroadcastAsUser(broadcastIntent, android.os.Process.myUserHandle());
+    }
+
+    /**
+     * register to have connectivity change on NetworkConnectivityStatusReceiver.
+     * @param context Context object
+     */
+    public static void registerForNetworkConnectivityStatusReceiver(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "registerForNetworkConnectivityStatusReceiver");
+        }
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        // intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        NetworkConnectivityStatusReceiver networkConnectivityStatusReceiver = new NetworkConnectivityStatusReceiver();
+        context.registerReceiver(networkConnectivityStatusReceiver, intentFilter);
     }
 }

@@ -70,11 +70,17 @@ public class ApplicationManagementService extends JobIntentService implements AP
 
     // Convenience method for enqueuing work in to this service.
     public static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "enqueueWork");
+        }
         enqueueWork(context, ApplicationManagementService.class, JOB_ID, work);
     }
 
     @Override
     protected void onHandleWork(Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onHandleWork");
+        }
         Bundle extras = intent.getExtras();
         context = this.getApplicationContext();
         utils = new ServerConfig();
@@ -122,6 +128,9 @@ public class ApplicationManagementService extends JobIntentService implements AP
      * @param operation - Operation object.
      */
     public void doTask(String operation) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "doTask");
+        }
         ApplicationManager applicationManager = new ApplicationManager(context);
         switch (operation) {
             case Constants.Operation.GET_APPLICATION_LIST:
@@ -278,6 +287,9 @@ public class ApplicationManagementService extends JobIntentService implements AP
      * Retriever application list from the server.
      */
     private void getAppListFromServer() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getAppListFromServer");
+        }
         Context context = this.getApplicationContext();
         String ipSaved = Constants.DEFAULT_HOST;
         String prefIP = Preference.getString(context, Constants.PreferenceFlag.IP);
@@ -296,6 +308,9 @@ public class ApplicationManagementService extends JobIntentService implements AP
     }
 
     private void sendBroadcast(String status, String payload) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendBroadCast");
+        }
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(Constants.ACTION_RESPONSE);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -307,6 +322,9 @@ public class ApplicationManagementService extends JobIntentService implements AP
 
     @Override
     public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceiveAPIResult");
+        }
         String responseStatus;
         String response;
         if (requestCode == Constants.APP_LIST_REQUEST_CODE) {

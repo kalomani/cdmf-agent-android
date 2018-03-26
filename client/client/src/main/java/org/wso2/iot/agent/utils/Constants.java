@@ -641,8 +641,8 @@ public class Constants {
     // Screen share
     public static final String MAX_WIDTH = "maxWidth";
     public static final String MAX_HEIGHT = "maxHeight";
-    public static final int DEFAULT_SCREEN_CAPTURE_IMAGE_HEIGHT = 768;
-    public static final int DEFAULT_SCREEN_CAPTURE_IMAGE_WIDTH = 1024;
+    public static final int DEFAULT_SCREEN_CAPTURE_IMAGE_HEIGHT = 800; //768;
+    public static final int DEFAULT_SCREEN_CAPTURE_IMAGE_WIDTH = 640; //1024;
     public static final int SCREEN_SHARING_RATE_IMAGES = 10;
     public static final int SCREEN_SHARING_RATE_MILLISECONDS = 1000;
     public static final int MAX_IMAGE_SIZE_BYTES = 20000;

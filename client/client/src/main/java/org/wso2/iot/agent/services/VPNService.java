@@ -31,6 +31,7 @@ import android.util.Log;
 import android.widget.Toast;
 import org.wso2.iot.agent.AlertActivity;
 import org.wso2.iot.agent.R;
+import org.wso2.iot.agent.utils.Constants;
 import org.wso2.iot.agent.utils.Preference;
 
 import java.io.FileInputStream;
@@ -41,7 +42,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
 public class VPNService extends VpnService implements Handler.Callback, Runnable {
-    private static final String TAG = "VPNService";
+    private static final String TAG = VPNService.class.getName();
     private static final int CONNECTION_RETRY_COUNT = 10;
     private static final int CONNECTION_WAIT_TIMOUT = 3000;
     private static final int HANDSHAKE_BUFFER = 1024;
@@ -76,6 +77,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
 
     protected void foreground() {
         // launch service in foreground
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "foreground");
+        }
         int id = 11130;
         Log.i(TAG, "launch service in foreground");
         NotificationCompat.Builder mBuilder = null;
@@ -98,6 +102,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onStartCommand");
+        }
         // The handler is only used to show messages.
         if (handler == null) {
             handler = new Handler(this);
@@ -137,6 +144,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
 
     @Override
     public void onDestroy() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onDestroy");
+        }
         if (vpnThread != null) {
             vpnThread.interrupt();
         }
@@ -144,6 +154,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
 
     @Override
     public boolean handleMessage(Message message) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleMessage");
+        }
         if (message != null) {
             Toast.makeText(this, message.what, Toast.LENGTH_SHORT).show();
         }
@@ -152,6 +165,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
 
     @Override
     public synchronized void run() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "run");
+        }
         try {
             Log.d(TAG, "Starting");
             // If anything needs to be obtained using the network, get it now.
@@ -187,6 +203,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
     }
 
     private boolean run(InetSocketAddress server) throws InterruptedException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "run");
+        }
         DatagramChannel tunnel = null;
         boolean connected = false;
         try {
@@ -295,6 +314,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
     }
 
     private void doHandshake(DatagramChannel tunnel) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "doHandShake");
+        }
         /*To build a secured tunnel, we should perform mutual authentication
           and exchange session keys for encryption. We send the shared secret and wait
           for the server to send the parameters.
@@ -330,6 +352,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
     }
 
     private void establishVPN() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "establishVPN");
+        }
         Builder builder = new Builder();
         String address;
         if (serverPort != null) {
@@ -349,6 +374,9 @@ public class VPNService extends VpnService implements Handler.Callback, Runnable
     }
 
     private void configure(String parameters) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "configure");
+        }
         if (fileDescriptor != null && parameters.equals(vpnParameters)) {
             Log.d(TAG, "Using the previous interface");
             return;

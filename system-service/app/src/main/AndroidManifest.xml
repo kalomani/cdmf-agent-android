@@ -40,6 +40,7 @@
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission-sdk-23 android:name="android.permission.MASTER_CLEAR" />
 
     <permission
@@ -58,7 +59,8 @@
             android:name="org.wso2.iot.system.service.SystemService"
             android:enabled="true"
             android:exported="true"
-            android:permission="org.wso2.iot.system.service.permission.ACCESS">
+            android:permission="org.wso2.iot.system.service.permission.ACCESS" >
+            <!-- android:permission="android.permission.BIND_JOB_SERVICE" -->
             <intent-filter>
                 <action android:name="org.wso2.iot.system.service.START_SERVICE" />
             </intent-filter>
@@ -81,7 +83,7 @@
             android:name="org.wso2.iot.system.service.services.NetworkConnectivityStatusReceiver"
             android:label="NetworkConnectivityStatusReceiver">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <!--action android:name="android.net.conn.CONNECTIVITY_CHANGE" /-->
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>

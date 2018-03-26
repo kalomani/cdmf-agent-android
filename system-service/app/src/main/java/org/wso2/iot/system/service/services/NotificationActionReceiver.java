@@ -16,10 +16,13 @@ import java.net.MalformedURLException;
 
 public class NotificationActionReceiver extends BroadcastReceiver {
 
-    private static final String TAG = NotificationActionReceiver.class.getSimpleName();
+    private static final String TAG = NotificationActionReceiver.class.getName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceiver");
+        }
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(Constants.DEFAULT_NOTIFICATION_CODE);

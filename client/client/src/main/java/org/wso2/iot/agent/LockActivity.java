@@ -19,11 +19,14 @@ import org.wso2.iot.agent.utils.Constants;
  */
 public class LockActivity extends Activity {
 
-    private static final String TAG = LockActivity.class.getSimpleName();
+    private static final String TAG = LockActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -42,6 +45,9 @@ public class LockActivity extends Activity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onPostCreate");
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -54,6 +60,9 @@ public class LockActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onBackPressed");
+        }
         Toast.makeText(this, "Device is locked", Toast.LENGTH_LONG).show();
     }
 

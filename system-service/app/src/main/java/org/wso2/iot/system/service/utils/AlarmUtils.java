@@ -37,7 +37,7 @@ import java.util.Locale;
  */
 public class AlarmUtils {
 
-    private static final String TAG = AlarmUtils.class.getSimpleName();
+    private static final String TAG = AlarmUtils.class.getName();
 
     private static final int DEFAULT_TIME_MILLISECONDS = 1000;
     private static final int RECURRING_REQUEST_CODE = 200;
@@ -49,6 +49,9 @@ public class AlarmUtils {
      * @param  interval - Time interval that alarm should repeat.
      */
     public static void setRecurringAlarm(Context context, int interval) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setRecurringAlarm");
+        }
         long startTime = SystemClock.elapsedRealtime() + DEFAULT_TIME_MILLISECONDS;
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent recurringAlarmIntent =
@@ -68,6 +71,9 @@ public class AlarmUtils {
      * @param  time - Time that alarm should trigger.
      */
     public static void setOneTimeAlarm(Context context, String time, String operation, String packageUri) throws ParseException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setOneTimeAlarm");
+        }
         try {
             SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT, Locale.ENGLISH);
             Date date = formatter.parse(time);

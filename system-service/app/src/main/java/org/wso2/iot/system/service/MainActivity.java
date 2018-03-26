@@ -26,17 +26,32 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.wso2.iot.system.service.utils.CommonUtils;
+import org.wso2.iot.system.service.utils.Constants;
+
 public class MainActivity extends Activity {
     private static final int ACTIVATION_REQUEST = 47;
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
         setContentView(R.layout.activity_main);
         ComponentName receiver = new ComponentName(this, ServiceDeviceAdminReceiver.class);
+        // CommonUtils.registerForNetworkConnectivityStatusReceiver(this);
+        // SystemService.enqueueWork(this, getIntent());
         startDeviceAdminPrompt(receiver);
+    }
+
+    // todo This function is a test only.
+    @Override
+    protected void onStart() {
+        super.onStart();
+        CommonUtils.registerForNetworkConnectivityStatusReceiver(this);
+        //SystemService.enqueueWork(this, getIntent());
     }
 
     /**
@@ -45,7 +60,9 @@ public class MainActivity extends Activity {
      * @param cdmDeviceAdmin - Device admin component.
      */
     private void startDeviceAdminPrompt(ComponentName cdmDeviceAdmin) {
-        Log.d(TAG, "startDeviceAdminPrompt");
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startDeviceAdminPrompt");
+        }
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         if (!devicePolicyManager.isAdminActive(cdmDeviceAdmin)) {
             Log.d(TAG, "not admin active");
@@ -66,7 +83,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult with requestCode: " + requestCode + " and resultCode: " + requestCode);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onActivityResult with requestCode: " + requestCode + " and resultCode: " + requestCode);
+        }
         if (requestCode == ACTIVATION_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 finish();

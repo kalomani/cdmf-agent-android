@@ -24,6 +24,7 @@ import android.os.Build;
 import android.util.Log;
 import org.wso2.iot.system.service.BuildConfig;
 import org.wso2.iot.system.service.SystemService;
+import org.wso2.iot.system.service.utils.Constants;
 
 import static android.app.admin.DevicePolicyManager.WIPE_EXTERNAL_STORAGE;
 
@@ -31,6 +32,9 @@ public class SettingsManager {
     private static final String TAG = SettingsManager.class.getName();
 
     public static void makeDeviceOwner() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "makeDeviceOwner");
+        }
         ComponentName componentName = new ComponentName(BuildConfig.APPLICATION_ID, SystemService.class.getName());
         SystemService.devicePolicyManager.setDeviceOwner(componentName);
         Log.i(TAG, "enabled device owner");
@@ -38,6 +42,9 @@ public class SettingsManager {
 
     @SuppressWarnings("deprecation")
     public static void clearDeviceOwner() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearDeviceOwner");
+        }
         Log.i(TAG, "disabled device owner");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             SystemService.devicePolicyManager.wipeData(WIPE_EXTERNAL_STORAGE);
@@ -51,6 +58,9 @@ public class SettingsManager {
     }
 
     public static boolean restrict(String code, boolean state) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "restrict");
+        }
         Log.d(TAG, "Restriction :" + code + " , set to:" + state);
         boolean restrictionState = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
@@ -72,24 +82,36 @@ public class SettingsManager {
     }
 
     public static void setScreenCaptureDisabled(boolean value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setScreenCaptureDisabled");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             SystemService.devicePolicyManager.setScreenCaptureDisabled(SystemService.cdmDeviceAdmin, value);
         }
     }
 
     public static void setStatusBarDisabled(boolean value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setStatusBarDisabled");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             SystemService.devicePolicyManager.setStatusBarDisabled(SystemService.cdmDeviceAdmin, value);
         }
     }
 
     public static void setAutoTimeRequired(boolean value) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setAutoTimeRequired");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             SystemService.devicePolicyManager.setAutoTimeRequired(SystemService.cdmDeviceAdmin, value);
         }
     }
 
     public static void setVisibilityOfApp(String packageName , boolean visibility) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setVisibilityOfApp");
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Log.i(TAG, "visibility of package "+ packageName + " will be set to "+ visibility);
             SystemService.devicePolicyManager.setApplicationHidden(SystemService.cdmDeviceAdmin, packageName, !visibility);
@@ -103,6 +125,9 @@ public class SettingsManager {
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public static boolean isDeviceOwner() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isDeviceOwner");
+        }
         return SystemService.devicePolicyManager.isDeviceOwnerApp(BuildConfig.APPLICATION_ID);
     }
 

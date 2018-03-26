@@ -27,13 +27,20 @@ import java.io.File;
  * Utility class to hold file manipulation methods.
  */
 public class FileUtils {
+    private static final String TAG = FileUtils.class.getName();
 
     public static String getUpgradePackageDirectory(){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getUpgradePackageDirectory");
+        }
 //        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
         return Environment.getDownloadCacheDirectory().getPath();
     }
 
     public static String getUpgradePackageFilePath() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getUpgradePackageFilePath");
+        }
         String path = getUpgradePackageDirectory();
         Log.d(FileUtils.class.getName(), path + File.separator + Constants.UPDATE_PACKAGE_NAME);
 //        return getUpgradePackageDirectory() + File.separator + Constants.UPDATE_PACKAGE_NAME;
@@ -41,6 +48,9 @@ public class FileUtils {
     }
 
     public static String getOTAPackageFilePath() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getOTAPackageFilePath");
+        }
         String path = getUpgradePackageDirectory();
         return getUpgradePackageDirectory() + File.separator + "ota";
     }

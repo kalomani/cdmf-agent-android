@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
  * Class @{@link InputEventHandler} for manage input events
  */
 public class InputEventHandler {
-    private static final String TAG = InputEventHandler.class.getSimpleName();
+    private static final String TAG = InputEventHandler.class.getName();
 
     private static int INJECT_INPUT_EVENT_MODE_ASYNC;
     private static int INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT;
@@ -52,6 +52,9 @@ public class InputEventHandler {
     private int inputAllowance = Constants.INPUT_THRESHOLD;
 
     private InputEventHandler(Context c) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "InputEventHandler");
+        }
         mInputManager = c.getSystemService(Context.INPUT_SERVICE);
         powerManager = (PowerManager) c.getSystemService(Context.POWER_SERVICE);
         try {
@@ -84,6 +87,9 @@ public class InputEventHandler {
      * @return InputEventHandler.
      */
     public static InputEventHandler getInstance(Context context) throws Exception {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getInstance");
+        }
         if (injectionManager == null) {
             synchronized (instance_lock) {
                 if (injectionManager == null) {
@@ -103,7 +109,9 @@ public class InputEventHandler {
      * @param duration event duration
      */
     public synchronized void injectTouchEvent(float x, float y, int action, int duration) {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "injectTouchEvent");
+        }
         /*
         input events should be injected in order as
         down,(move)*,up
@@ -159,8 +167,7 @@ public class InputEventHandler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             if (!powerManager.isInteractive()) {
-                PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK |
-                        PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
+                PowerManager.WakeLock TempWakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP, "ScreenLock");
                 TempWakeLock.acquire();
                 TempWakeLock.release();
             }
@@ -197,6 +204,9 @@ public class InputEventHandler {
      * @param mode mode
      */
     private void injectEvent(int action, InputEvent ie, int mode) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "injectEvent");
+        }
         try {
             mInjectEventMethod.invoke(mInputManager, ie, mode);
             lastEvent = action;

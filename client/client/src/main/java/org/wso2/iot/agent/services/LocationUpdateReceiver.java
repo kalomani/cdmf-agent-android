@@ -12,13 +12,19 @@ import org.wso2.iot.agent.utils.Constants;
 
 public class LocationUpdateReceiver extends BroadcastReceiver {
 
-    private static final String TAG = LocationUpdateReceiver.class.getSimpleName();
+    private static final String TAG = LocationUpdateReceiver.class.getName();
     private static Location location;
 
     public LocationUpdateReceiver() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
     }
 
     public static Location getLocation() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getLocation");
+        }
         if (location == null) {
             Log.w(TAG, "Location not found");
         }
@@ -27,6 +33,9 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onReceive");
+        }
         if (intent.hasExtra(Constants.Location.LOCATION)) {
             location = intent.getParcelableExtra(Constants.Location.LOCATION);
         }

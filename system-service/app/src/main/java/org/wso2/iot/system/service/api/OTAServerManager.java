@@ -79,7 +79,7 @@ import java.util.concurrent.TimeUnit;
  * all the steps required from downloading the update package to installing it on the device.
  */
 public class OTAServerManager {
-    private static final String TAG = "OTA_SM";
+    private static final String TAG = OTAServerManager.class.getName();
     private static final String BUILD_DATE_UTC_PROPERTY = "ro.build.date.utc";
     private static final int DEFAULT_STATE_ERROR_CODE = 0;
     private static final int DEFAULT_STATE_INFO_CODE = 0;
@@ -124,6 +124,9 @@ public class OTAServerManager {
     };
 
     public OTAServerManager(Context context) throws MalformedURLException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "OTAServerManager");
+        }
         serverConfig = new OTAServerConfig(Build.PRODUCT, context);
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         // wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "OTA Wakelock");
@@ -132,10 +135,16 @@ public class OTAServerManager {
     }
 
     public void setStateChangeListener(OTAStateChangeListener stateChangeListener) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setStateChangeListener");
+        }
         this.stateChangeListener = stateChangeListener;
     }
 
     public boolean checkNetworkOnline() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkNetworkOnline");
+        }
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         boolean status = false;
@@ -147,6 +156,9 @@ public class OTAServerManager {
     }
 
     public void startCheckingVersion() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startCheckingVersion");
+        }
         if (this.stateChangeListener != null) {
             if (checkNetworkOnline()) {
                 getTargetPackagePropertyList(this.serverConfig.getBuildPropURL());
@@ -170,6 +182,9 @@ public class OTAServerManager {
      * @return - Returns true if the firmware needs to be upgraded.
      */
     public boolean compareLocalVersionToServer(BuildPropParser parser) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "compareLocalVersionToServer");
+        }
         if (parser == null) {
             Log.d(TAG, "compareLocalVersion Without fetch remote prop list.");
             return false;
@@ -193,6 +208,9 @@ public class OTAServerManager {
 
     //ToDo: This method needs to be edited
     private void publishDownloadProgress(long total, long downloaded) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "publishDownloadProgress");
+        }
         long progress = (downloaded * 100) / total;
         long published = -1L;
         if (Preference.getString(context, context.getResources().getString(R.string.firmware_download_progress)) != null) {
@@ -220,6 +238,9 @@ public class OTAServerManager {
 
     //ToDo: This method needs to be edited
     private void publishFirmwareDownloadProgress(long progress) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "publishFirmwareDownloadProgress");
+        }
         JSONObject result = new JSONObject();
         try {
             result.put("progress", String.valueOf(progress));
@@ -233,6 +254,9 @@ public class OTAServerManager {
     }
 
     void reportCheckingError(int error) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "reportCheckingError");
+        }
         if (this.stateChangeListener != null) {
             this.stateChangeListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_CHECKED,
                     error, null, DEFAULT_STATE_INFO_CODE);
@@ -240,6 +264,9 @@ public class OTAServerManager {
     }
 
     void reportDownloadError(int error) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "reportDownloadError");
+        }
         if (this.stateChangeListener != null) {
             this.stateChangeListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_DOWNLOADING,
                     error, null, DEFAULT_STATE_INFO_CODE);
@@ -247,6 +274,9 @@ public class OTAServerManager {
     }
 
     void reportInstallError(int error) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "reportInstallError");
+        }
         if (this.stateChangeListener != null) {
             this.stateChangeListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_UPGRADING,
                     error, null, DEFAULT_STATE_INFO_CODE);
@@ -302,6 +332,9 @@ public class OTAServerManager {
     }
 
     private void renameDownloadedFile(String otaPackageName){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "renameDownloadedFile");
+        }
         try {
 
             File otaFolder = new File(FileUtils.getOTAPackageFilePath());
@@ -323,6 +356,9 @@ public class OTAServerManager {
     }
 
     private void clearCacheDirectory(){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "clearCacheDirectory");
+        }
         File cacheDirectory = new File(FileUtils.getUpgradePackageDirectory());
 
         if (cacheDirectory.exists()) {
@@ -339,10 +375,16 @@ public class OTAServerManager {
     }
 
     private void deleteRecursive(File fileOrDirectory) throws IOException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "deleteRecursive");
+        }
         deleteRecursive(fileOrDirectory, 0);
     }
 
     private void deleteRecursive(File fileOrDirectory, int level) throws IOException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "deleteRecursive");
+        }
         if (fileOrDirectory != null && fileOrDirectory.isDirectory() && fileOrDirectory.listFiles() != null && fileOrDirectory.listFiles().length > 0) {
             for (File child : fileOrDirectory.listFiles()) {
                 if (!dontDeleteTheseFolders.contains(child.getName())) {
@@ -366,6 +408,9 @@ public class OTAServerManager {
 
 
     public void startDownloadUpgradePackage(final OTAServerManager serverManager) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startDownloadUpgradePackage");
+        }
         boolean isAvailabledownloadReference = Preference.getBoolean(context, context.getResources().getString(R.string.download_manager_reference_id_available));
         if(!isAvailabledownloadReference) {
             if (asyncTask != null) {
@@ -667,8 +712,14 @@ public class OTAServerManager {
     }
 
     public long getFreeDiskSpace() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getFreeDiskSpace");
+        }
         StatFs statFs = new StatFs(FileUtils.getUpgradePackageDirectory());
-        long freeDiskSpace = (long) statFs.getAvailableBlocksLong() * (long) statFs.getBlockSizeLong();
+        long freeDiskSpace = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            freeDiskSpace = (long) statFs.getAvailableBlocksLong() * (long) statFs.getBlockSizeLong();
+        }
         /*if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Free disk space: " + freeDiskSpace);
         }*/
@@ -676,6 +727,9 @@ public class OTAServerManager {
     }
 
     public void startVerifyUpgradePackage() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startVerifyUpgradePackage");
+        }
         Preference.putBoolean(context, context.getResources().getString(R.string.verification_failed_flag), false);
         File recoveryFile = new File(FileUtils.getUpgradePackageFilePath());
         try {
@@ -696,10 +750,16 @@ public class OTAServerManager {
     }
 
     public OTAServerConfig getServerConfig() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getServerConfig");
+        }
         return this.serverConfig;
     }
 
     public void startInstallUpgradePackage() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startInstallUpgradePackage");
+        }
         Preference.putString(context, context.getResources().getString(R.string.upgrade_download_status), Constants.Status.SUCCESSFUL);
         Preference.putString(context, context.getResources().getString(R.string.upgrade_install_status), Constants.Status.REQUEST_PLACED);
         File recoveryFile = new File(FileUtils.getUpgradePackageFilePath());
@@ -751,6 +811,9 @@ public class OTAServerManager {
     }
 
     private void setNotification(Context context, String notificationMessage, boolean isUserInput) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setNotification");
+        }
         int requestID = (int) System.currentTimeMillis();
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(context, MainActivity.class);
@@ -793,6 +856,9 @@ public class OTAServerManager {
     }
 
     private int getBatteryLevel(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getBatteryLevel");
+        }
         Intent batteryIntent = context.registerReceiver(null,
                 new IntentFilter(
                         Intent.ACTION_BATTERY_CHANGED));
@@ -809,7 +875,9 @@ public class OTAServerManager {
      * The caller can parse this list and get information.
      */
     public void getTargetPackagePropertyList(final URL url) {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getTargetPackagePropertyList");
+        }
         final String  operation = Preference.getBoolean(context, context.getResources().getString(R.string.
                 firmware_status_check_in_progress)) ? Constants.Operation.GET_FIRMWARE_UPGRADE_PACKAGE_STATUS : Constants.Operation.UPGRADE_FIRMWARE;
 

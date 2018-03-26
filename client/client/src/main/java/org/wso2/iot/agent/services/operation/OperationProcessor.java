@@ -46,7 +46,7 @@ public class OperationProcessor {
     private OperationManager operationManager;
     private Context context;
 
-    private static final String TAG = OperationProcessor.class.getSimpleName();
+    private static final String TAG = OperationProcessor.class.getName();
 
     public OperationProcessor(Context context) {
         this.context = context;
@@ -54,6 +54,7 @@ public class OperationProcessor {
         /* Get matching OperationManager from the Factory */
         OperationManagerFactory operationManagerFactory = new OperationManagerFactory(context);
         operationManager = operationManagerFactory.getOperationManager();
+        Log.d(TAG, "creation");
     }
 
     /**
@@ -71,6 +72,9 @@ public class OperationProcessor {
      * @param operation - Operation object.
      */
     public void doTask(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "doTask: " + operation.getCode());
+        }
         switch (operation.getCode()) {
             case Constants.Operation.DEVICE_INFO:
                 operationManager.getDeviceInfo(operation);
@@ -251,6 +255,9 @@ public class OperationProcessor {
      * @param operation - Operation object.
      */
     public void setPolicyBundle(org.wso2.iot.agent.beans.Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setPolicyBundle: " + operation.getCode());
+        }
         if (isDeviceAdminActive()) {
             if (Preference.getString(context, Constants.PreferenceFlag.APPLIED_POLICY) != null) {
                 operationManager.revokePolicy(operation);
@@ -299,6 +306,9 @@ public class OperationProcessor {
     }
 
     private boolean isDeviceAdminActive() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "isDeviceAdminActive");
+        }
         DevicePolicyManager devicePolicyManager =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName cdmDeviceAdmin = new ComponentName(context, AgentDeviceAdminReceiver.class);
@@ -310,6 +320,9 @@ public class OperationProcessor {
      * and send if found any.
      */
     public void checkPreviousNotifications() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkPreviousNotifications");
+        }
         List<Operation> operations = NotificationService.getInstance(context.getApplicationContext()).checkPreviousNotifications();
         for (Operation operation : operations) {
             operationManager.getResultBuilder().build(operation);

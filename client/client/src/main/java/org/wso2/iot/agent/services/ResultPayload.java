@@ -17,7 +17,10 @@
  */
 package org.wso2.iot.agent.services;
 
+import android.telecom.Log;
+
 import org.wso2.iot.agent.beans.Operation;
+import org.wso2.iot.agent.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +29,13 @@ import java.util.List;
  * This class handles building of the operation list result payload to be sent to the server.
  */
 public class ResultPayload {
-
+	private static final String TAG = ResultPayload.class.getName();
 	private List<Operation> operationResponses;
 
 	public ResultPayload(){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
 		this.operationResponses = new ArrayList<Operation>();
 	}
 
@@ -38,6 +44,9 @@ public class ResultPayload {
 	 * @param operation
 	 */
 	public void build(org.wso2.iot.agent.beans.Operation operation) {
+		if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "build");
+        }
 		if (operation.getId() > 0) {
 			operationResponses.add(operation);
 		}
@@ -48,7 +57,10 @@ public class ResultPayload {
 	 * @return - List of operations
 	 */
 	public List<Operation> getResultPayload(){
-		return this.operationResponses;
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getResultPayload");
+        }
+        return this.operationResponses;
 	}
 
 	/**
@@ -57,6 +69,9 @@ public class ResultPayload {
 	 * @return returns an object if id matches.
 	 */
 	public Operation getResult(int id) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getResult");
+        }
 		for (Operation operation : operationResponses) {
 			if (operation.getId() == id) {
 				return operation;

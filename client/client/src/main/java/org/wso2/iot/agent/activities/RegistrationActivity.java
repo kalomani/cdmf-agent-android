@@ -71,6 +71,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
 		setContentView(R.layout.activity_registration);
 		context = this;
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
@@ -80,7 +83,10 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 
 	@Override
 	protected void onResume(){
-		super.onResume();
+        super.onResume();
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onResume");
+        }
 		if (Constants.NOTIFIER_FCM.equals(Preference.getString(context, Constants.PreferenceFlag.NOTIFIER_TYPE))) {
 			registerFCM();
 		} else {
@@ -91,6 +97,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	@Override
 	protected void onPause(){
 		super.onPause();
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onPause");
+        }
 		CommonDialogUtils.stopProgressDialog(progressDialog);
 		if (isFCMTokenReceiverRegistered) {
 			unregisterReceiver(fcmTokenReceiver);
@@ -98,6 +107,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	}
 
 	private void registerDevice() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "registerDevice");
+        }
 		progressDialog = CommonDialogUtils.showProgressDialog(RegistrationActivity.this,
 				getResources().getString(R.string.dialog_enrolling),
 				getResources().getString(R.string.dialog_please_wait),
@@ -150,6 +162,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onKeyDown");
+        }
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			Intent i = new Intent();
 			i.setAction(Intent.ACTION_MAIN);
@@ -177,6 +192,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	 * Loads Already registered activity.
 	 */
 	private void loadAlreadyRegisteredActivity(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadAlreadyRegisteredActivity");
+        }
 		Intent intent =
 				new Intent(RegistrationActivity.this,
 				           AlreadyRegisteredActivity.class);
@@ -187,6 +205,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	}
 
 	private void loadKioskActivity(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadKioskActivity");
+        }
 		Intent intent =
 				new Intent(RegistrationActivity.this, KioskActivity.class);
 		intent.putExtra(getResources().getString(R.string.intent_extra_fresh_reg_flag), true);
@@ -199,6 +220,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	 * Display connectivity error.
 	 */
 	private void displayConnectionError(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "displayConnectionError");
+        }
 		RegistrationActivity.this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -215,6 +239,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	 * Display internal server error.
 	 */
 	private void displayInternalServerError(){
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "displayInternalServerError");
+        }
 		RegistrationActivity.this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -231,6 +258,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	 * Display FCM services error
 	 */
 	private void displayFCMServicesError() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "displayFCMServicesError");
+        }
 		RegistrationActivity.this.runOnUiThread(new Runnable() {
 			@Override public void run() {
 				CommonDialogUtils.getAlertDialogWithOneButtonAndTitle(context,
@@ -243,6 +273,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 
 	@Override
 	public void onReceiveAPIResult(Map<String, String> result, int requestCode) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onReceiveAPIResult");
+        }
 		DeviceInfo info = new DeviceInfo(context);
 		if (Constants.REGISTER_REQUEST_CODE == requestCode) {
 			String responseStatus;
@@ -294,6 +327,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
      * to the MDM server so that it can send notifications to the device.
      */
 	private void registerFCM() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "registerFCM");
+        }
 		String token =  FirebaseInstanceId.getInstance().getToken();
 		if(token != null) {
 			if (Constants.DEBUG_MODE_ENABLED){
@@ -326,6 +362,9 @@ public class RegistrationActivity extends Activity implements APIResultCallBack 
 	 * Loads Authentication activity.
 	 */
 	private void loadAuthenticationActivity() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "loadAuthenticationActivity");
+        }
 		Preference.putString(context, Constants.PreferenceFlag.IP, null);
 		Intent intent = new Intent( RegistrationActivity.this, AuthenticationActivity.class);
 		intent.putExtra(getResources().getString(R.string.intent_extra_from_activity), RegistrationActivity.class.getSimpleName());

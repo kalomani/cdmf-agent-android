@@ -25,6 +25,7 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import org.wso2.iot.agent.services.screenshare.ScreenSharingService;
 import org.wso2.iot.agent.utils.Constants;
@@ -36,7 +37,7 @@ public class ScreenShareActivity extends Activity {
 
     private Context context;
     private Resources resources;
-    private static final String TAG = ScreenShareActivity.class.getSimpleName();
+    private static final String TAG = ScreenShareActivity.class.getName();
     private MediaProjectionManager mgr;
     private static final int REQUEST_SCREENSHOT = 59706;
     private int maxWidth = 0;
@@ -46,6 +47,9 @@ public class ScreenShareActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
         context = ScreenShareActivity.this.getApplicationContext();
         this.resources = context.getResources();
         Bundle extras = getIntent().getExtras();
@@ -62,6 +66,9 @@ public class ScreenShareActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onActivityResult");
+        }
         if (requestCode == REQUEST_SCREENSHOT) {
             if (resultCode == RESULT_OK) {
                 Intent i =

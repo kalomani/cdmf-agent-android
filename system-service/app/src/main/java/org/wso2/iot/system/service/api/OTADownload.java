@@ -43,7 +43,7 @@ import java.util.Locale;
 
 public class OTADownload implements OTAServerManager.OTAStateChangeListener {
 
-    private static final String TAG = "OTADownload";
+    private static final String TAG = OTADownload.class.getName();
     private static final String SI_UNITS_INDEX = "kMGTPE";
     private static final String BINARY_UNITS_INDEX = "KMGTPE";
     private static final String UPGRADE_AVAILABLE = "upgradeAvailable";
@@ -55,6 +55,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     private OTAServerManager otaServerManager;
 
     public OTADownload(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "OTADownload");
+        }
         this.context = context;
         Preference.putString(context, context.getResources().getString(R.string.upgrade_download_status),
                 Constants.Status.REQUEST_PLACED);
@@ -80,6 +83,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public OTAServerManager getOtaServerManager(){
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getOtaServerManager");
+        }
         return otaServerManager;
     }
 
@@ -91,6 +97,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
      * @return - Byte count string.
      */
     public String byteCountToDisplaySize(long bytes, boolean isSI) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "byteCountToDisplaySize");
+        }
         int unit = isSI ? 1000 : 1024;
         if (bytes < unit) {
             return bytes + " B";
@@ -101,6 +110,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public void startOTA() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startOTA");
+        }
         // If the URL is not correctly provided, server manager will be null
         if (otaServerManager != null) {
             CommonUtils.sendBroadcast(context, Constants.Operation.UPGRADE_FIRMWARE, Constants.Code.SUCCESS,
@@ -111,6 +123,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     private int getBatteryLevel(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getBatteryLevel");
+        }
         Intent batteryIntent = context.registerReceiver(null,
                 new IntentFilter(
                         Intent.ACTION_BATTERY_CHANGED));
@@ -123,6 +138,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public void onStateOrProgress(int message, int error, BuildPropParser parser, long info) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onStateOrProgress");
+        }
         /* State change will be 0 -> Checked(1) -> Downloading(2) -> Upgrading(3) */
         switch (message) {
             case STATE_IN_CHECKED:
@@ -143,6 +161,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public boolean checkNetworkOnline() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkNetworkOnline");
+        }
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         boolean status = false;
@@ -154,6 +175,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public void onStateChecked(int error, final BuildPropParser parser) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onStateChecked");
+        }
         final String  operation = Preference.getBoolean(context, context.getResources().getString(R.string.
                 firmware_status_check_in_progress)) ? Constants.Operation.GET_FIRMWARE_UPGRADE_PACKAGE_STATUS : Constants.Operation.UPGRADE_FIRMWARE;
         if (error == 0) {
@@ -297,6 +321,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public void onStateDownload(int error, Object info) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onStateDownload");
+        }
         Log.i(TAG, "Printing package information " + info.toString());
         if (error == ERROR_CANNOT_FIND_SERVER) {
             Log.e(TAG, "Error: server does not have an upgrade package.");
@@ -320,6 +347,9 @@ public class OTADownload implements OTAServerManager.OTAStateChangeListener {
     }
 
     public void onStateUpgrade(int error) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onStateUpgrade");
+        }
         String  operation = Preference.getBoolean(context, context.getResources().getString(R.string.
                 firmware_status_check_in_progress)) ? Constants.Operation.GET_FIRMWARE_UPGRADE_PACKAGE_STATUS : Constants.Operation.UPGRADE_FIRMWARE;
         if (error == ERROR_PACKAGE_VERIFY_FAILED) {

@@ -18,10 +18,11 @@
 
 package org.wso2.iot.agent.services.operation;
 
-import android.annotation.TargetApi;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import org.wso2.iot.agent.api.DeviceInfo;
 import org.wso2.iot.agent.utils.Constants;
 
@@ -40,6 +41,7 @@ public class OperationManagerFactory {
         this.manager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public OperationManager getOperationManager() {
         if ((info.getSdkVersion() >= Build.VERSION_CODES.JELLY_BEAN) &&
                 (info.getSdkVersion() < Build.VERSION_CODES.LOLLIPOP)) {
@@ -49,16 +51,17 @@ public class OperationManagerFactory {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private OperationManager getLollipopUpwardsOperationManager() {
         if(Constants.DEFAULT_OWNERSHIP == Constants.OWNERSHIP_COSU){
-          return new OperationManagerCOSU(context);
+            return new OperationManagerCOSU(context);
         }
         else if (manager.isProfileOwnerApp(Constants.AGENT_PACKAGE)) {
             return new OperationManagerWorkProfile(context);
         }
         else if (manager.isDeviceOwnerApp(Constants.SYSTEM_SERVICE_PACKAGE) || manager.isDeviceOwnerApp(Constants.AGENT_PACKAGE)) {
-                return new OperationManagerDeviceOwner(context);
+            return new OperationManagerDeviceOwner(context);
         }
         else {
             return new OperationManagerBYOD(context);

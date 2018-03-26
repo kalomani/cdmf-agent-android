@@ -53,7 +53,7 @@ public class WebSocketSessionHandler {
     private String serverUrl;
     private int operationId;
     private AndroidWebSocketClient androidWebSocketClient;
-    private static final String TAG = WebSocketSessionHandler.class.getSimpleName();
+    private static final String TAG = WebSocketSessionHandler.class.getName();
     private static Object instance_lock = new Object();
     private OperationManager operationManager;
     private final Object writeLockObject = new Object();
@@ -61,7 +61,11 @@ public class WebSocketSessionHandler {
     /**
      * Default constructor for the WebSocketSessionHandler.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private WebSocketSessionHandler(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         this.context = context;
         OperationManagerFactory operationManagerFactory = new OperationManagerFactory(context);
         operationManager = operationManagerFactory.getOperationManager();
@@ -73,7 +77,11 @@ public class WebSocketSessionHandler {
      * @param context is the android context object.
      * @return WebSocketSessionHandler.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static WebSocketSessionHandler getInstance(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getInstance");
+        }
         if (wsInstance == null) {
             synchronized (instance_lock) {
                 if (wsInstance == null) {
@@ -92,6 +100,9 @@ public class WebSocketSessionHandler {
      * @throws TransportHandlerException throws when error occur with web socket session
      */
     public void initializeSession(String serverURL, int operationId) throws TransportHandlerException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "initializeSession");
+        }
         if (this.operationId == operationId) {
             Log.w(TAG, "operation id : " + operationId + " is already connected");
             return;
@@ -126,11 +137,16 @@ public class WebSocketSessionHandler {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    /*
+
+    /**
      * Use to handle web socket message
+     * @param message is a message
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void handleSessionMessage(String message) throws TransportHandlerException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "handleSessionMessage");
+        }
         Operation operation = new Operation();
         try {
             JSONObject request = new JSONObject(message);
@@ -173,6 +189,9 @@ public class WebSocketSessionHandler {
      * Close the web socket session
      */
     public void endSession() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "endSession");
+        }
         context.stopService(new Intent(context, ScreenSharingService.class));
         if (androidWebSocketClient != null && androidWebSocketClient.getConnection() != null &&
                 androidWebSocketClient.getConnection().isOpen()) {
@@ -187,6 +206,9 @@ public class WebSocketSessionHandler {
      * @param message String message
      */
     public void sendMessage(String message) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendMessage");
+        }
         if (message != null && androidWebSocketClient != null && androidWebSocketClient.getConnection().isOpen()) {
             synchronized (writeLockObject) {
                 androidWebSocketClient.send(message);
@@ -204,6 +226,9 @@ public class WebSocketSessionHandler {
      * @param message Byte message
      */
     public void sendMessage(byte[] message) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendMessage");
+        }
         if (message != null && androidWebSocketClient != null && androidWebSocketClient.getConnection().isOpen()) {
             synchronized (writeLockObject) {
                 androidWebSocketClient.send(message);
@@ -222,6 +247,9 @@ public class WebSocketSessionHandler {
      * @throws TransportHandlerException
      */
     public void sendMessage(Operation operation) throws TransportHandlerException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "sendMessage");
+        }
         try {
             if (operation != null && operation.getId() == operationId) {
                 JSONObject payload = new JSONObject();
@@ -250,10 +278,16 @@ public class WebSocketSessionHandler {
      * @return operation id
      */
     public int getOperationId() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getOperationId");
+        }
         return operationId;
     }
 
     public void setOperationId(int operationId) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setOperationId");
+        }
         this.operationId = operationId;
     }
 }

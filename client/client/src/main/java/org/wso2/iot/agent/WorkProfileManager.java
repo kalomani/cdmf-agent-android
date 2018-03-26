@@ -31,18 +31,24 @@ import org.wso2.iot.agent.utils.Constants;
 public class WorkProfileManager extends Activity {
 
     private static final int REQUEST_PROVISION_MANAGED_PROFILE = 1;
-    private static final String TAG = WorkProfileManager.class.getSimpleName();
+    private static final String TAG = WorkProfileManager.class.getName();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
         provisionManagedProfile();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressWarnings("deprecation")
     private void provisionManagedProfile() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "provisionManagedProfile");
+        }
         Activity activity = this;
         Intent intent =
                 new Intent(android.app.admin.DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE);
@@ -84,6 +90,9 @@ public class WorkProfileManager extends Activity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onActivityResult");
+        }
         if (requestCode == REQUEST_PROVISION_MANAGED_PROFILE) {
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(this, Constants.WorkProfile.PROVISIONING_DONE, Toast.LENGTH_SHORT).show();

@@ -21,6 +21,8 @@ package org.wso2.iot.system.service.api;
 import android.content.Context;
 import android.util.Log;
 
+import org.wso2.iot.system.service.utils.Constants;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,25 +38,34 @@ import java.util.Scanner;
  * properties which is required in OTA (Over The Air) update process.
  */
 public class BuildPropParser {
-    private static final String TAG = "OTA_BPP";
+    private static final String TAG = BuildPropParser.class.getName();
     private static final String TEMP_FILE_PREFIX = "buildprop";
     private static final String TEMP_FILE_SUFFIX = "ss";
     private Context context;
     private HashMap<String, String> properties = null;
 
     BuildPropParser(ByteArrayOutputStream out, Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         this.context = context;
         properties = new HashMap<>();
         setByteArrayStream(out);
     }
 
     BuildPropParser(File file, Context context) throws IOException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         this.context = context;
         properties = new HashMap<>();
         setFile(file);
     }
 
     public String getProp(String propName) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getProp");
+        }
         if (properties != null) {
             return properties.get(propName);
         } else {
@@ -63,6 +74,9 @@ public class BuildPropParser {
     }
 
     public String setProp(String propName, String val) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setProp");
+        }
         if ((properties != null) && (propName != null) && (val != null)) {
             // returns previous value or null
             return properties.put(propName, val);
@@ -71,6 +85,9 @@ public class BuildPropParser {
     }
 
     private void setByteArrayStream(ByteArrayOutputStream out) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setByteArrayStream");
+        }
         FileOutputStream fileOutputStream = null;
         File tmpFile;
         try {
@@ -106,6 +123,9 @@ public class BuildPropParser {
     }
 
     private void setFile(File file) throws IOException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setFile");
+        }
         FileReader reader = new FileReader(file);
         BufferedReader in = new BufferedReader(reader);
         try {
@@ -156,6 +176,9 @@ public class BuildPropParser {
     }
 
     public String getNumRelease() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getNumRelease");
+        }
         if (properties != null) {
             return properties.get("ro.build.version.incremental");
         } else {

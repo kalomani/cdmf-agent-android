@@ -36,6 +36,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -75,7 +76,7 @@ public class KioskActivity extends Activity {
     private int kioskExit;
     private GridView gridView;
     private AppDrawerAdapter appDrawerAdapter;
-    private final String TAG = KioskActivity.class.getSimpleName();
+    private final String TAG = KioskActivity.class.getName();
     private AudioManager audio;
     private int ringerMode;
     private int ringerVolume;
@@ -90,6 +91,9 @@ public class KioskActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onCreate");
+        }
         setContentView(R.layout.activity_kiosk);
         context = this.getApplicationContext();
         deviceInfo = new DeviceInfo(this);
@@ -250,6 +254,9 @@ public class KioskActivity extends Activity {
     }
 
     private void showDialog(String title, String message, String buttonText) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "showDialog");
+        }
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_kiosk);
         dialog.setTitle("New Notification");
@@ -271,6 +278,9 @@ public class KioskActivity extends Activity {
     }
 
     private void showRingDialog() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "showRingDialog");
+        }
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.device_ring_kiosk);
         dialog.setTitle("Device Ring");
@@ -288,6 +298,9 @@ public class KioskActivity extends Activity {
     }
 
     private void checkAndDisplayDeviceInitializing() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "checkAndDisplayDeviceInitializing");
+        }
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -309,6 +322,9 @@ public class KioskActivity extends Activity {
     }
 
     private void displayDeviceInfo() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "displayDeviceInfo");
+        }
         Thread thread = new Thread() {
             final DeviceState phoneState = new DeviceState(context);
             Power power = phoneState.getBatteryDetails();
@@ -359,6 +375,9 @@ public class KioskActivity extends Activity {
     }
 
     private void startEvents() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startEvents");
+        }
         if (!EventRegistry.eventListeningStarted) {
             EventRegistry registerEvent = new EventRegistry(this);
             registerEvent.register();
@@ -366,6 +385,9 @@ public class KioskActivity extends Activity {
     }
 
     private void startPolling() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startPolling");
+        }
         if (!Constants.AUTO_ENROLLMENT_BACKGROUND_SERVICE_ENABLED) {
             LocalNotification.startPolling(getApplicationContext());
         }
@@ -373,6 +395,9 @@ public class KioskActivity extends Activity {
 
     /*Checks whether there is an already installed app and if exists the app will be launched*/
     private void launchKioskAppIfExists() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "launchKioskAppIfExists");
+        }
         Preference.putBoolean(context.getApplicationContext(), Constants.AGENT_FRESH_START, false);
         String appList = Preference.
                 getString(context.getApplicationContext(), Constants.KIOSK_APP_PACKAGE_NAME);
@@ -390,6 +415,9 @@ public class KioskActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onResume");
+        }
         refreshAppDrawer();
         startEvents();
         startPolling();
@@ -398,9 +426,15 @@ public class KioskActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onPause");
+        }
     }
 
     private void installKioskApp() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "installKioskApp");
+        }
         String appUrl = Preference.
                 getString(getApplicationContext(), Constants.KIOSK_APP_DOWNLOAD_URL);
         if (appUrl != null) {
@@ -412,6 +446,9 @@ public class KioskActivity extends Activity {
     }
 
     private void launchKioskApp(String packageName) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "launchKioskApp");
+        }
         if (packageName != null && !packageName.equals("")) {
             Intent launchIntent = getApplicationContext().getPackageManager()
                     .getLaunchIntentForPackage(packageName);
@@ -423,6 +460,9 @@ public class KioskActivity extends Activity {
     }
 
     private void refreshAppDrawer() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "refreshAppDrawer");
+        }
         String appList = Preference.getString(context, Constants.KIOSK_APP_PACKAGE_NAME);
         if (appList == null) {
             if (Preference.getBoolean(context, Constants.PreferenceFlag.DEVICE_INITIALIZED)) {
@@ -437,10 +477,12 @@ public class KioskActivity extends Activity {
         }
     }
 
-    @TargetApi(21)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @SuppressWarnings("deprecation")
     private void startRing() {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startRing");
+        }
         if (audio != null) {
             ringerMode = audio.getRingerMode();
             ringerVolume = audio.getStreamVolume(AudioManager.STREAM_RING);
@@ -468,6 +510,9 @@ public class KioskActivity extends Activity {
     }
 
     private void stopRing() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "stopRing");
+        }
         if (defaultRingtone != null && defaultRingtone.isPlaying()) {
             defaultRingtone.stop();
         }

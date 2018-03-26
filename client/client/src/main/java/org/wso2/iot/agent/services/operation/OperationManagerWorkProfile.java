@@ -44,13 +44,14 @@ import java.util.Objects;
 
 public class OperationManagerWorkProfile extends OperationManager {
 
-    private static final String TAG = OperationManagerWorkProfile.class.getSimpleName();
+    private static final String TAG = OperationManagerWorkProfile.class.getName();
     private NotificationService notificationService;
     private static final String STATUS = "status";
 
     public OperationManagerWorkProfile(Context context) {
         super(context);
         notificationService = super.getNotificationService();
+        Log.d(TAG, "creation");
     }
 
     @Override

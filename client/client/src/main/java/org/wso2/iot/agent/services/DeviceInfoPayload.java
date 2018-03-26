@@ -57,6 +57,9 @@ public class DeviceInfoPayload {
     private String registrationId;
 
     public DeviceInfoPayload(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         this.context = context.getApplicationContext();
         deviceInfo = new DeviceInfo(context);
         mapper = new ObjectMapper();
@@ -71,6 +74,9 @@ public class DeviceInfoPayload {
      * @param owner - Current user name.
      */
     public void build(String type, String owner) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "build");
+        }
         device = new Device();
         Device.EnrolmentInfo info = new Device.EnrolmentInfo();
         //setting up basic details of the device
@@ -87,6 +93,9 @@ public class DeviceInfoPayload {
      * @throws AndroidAgentException on error
      */
     public void build() throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "build");
+        }
         device = new Device();
         getInfo();
     }
@@ -98,7 +107,9 @@ public class DeviceInfoPayload {
      */
     @SuppressLint("HardwareIds")
     private void getInfo() throws AndroidAgentException {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getInfo");
+        }
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
         if (!CommonUtils.isServiceRunning(context, NetworkInfoService.class)) {
@@ -368,6 +379,9 @@ public class DeviceInfoPayload {
      * @return - Device info payload as a string.
      */
     public String getDeviceInfoPayload() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getDeviceInfoPayload");
+        }
         try {
             if (Constants.DEBUG_MODE_ENABLED) {
                 Log.d(TAG, "device info " + device.toJSON());

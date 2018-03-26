@@ -61,7 +61,9 @@ public class AgentDeviceAdminReceiver extends DeviceAdminReceiver implements API
     @Override
     public void onEnabled(final Context context, Intent intent) {
         super.onEnabled(context, intent);
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG,"onEnabled");
+        }
         if (!Constants.OWNERSHIP_COSU.equals(Constants.DEFAULT_OWNERSHIP)) {
             Preference.putBoolean(context, Constants.PreferenceFlag.DEVICE_ACTIVE, true);
             LocalNotification.startPolling(context);
@@ -74,7 +76,9 @@ public class AgentDeviceAdminReceiver extends DeviceAdminReceiver implements API
     @Override
     public void onDisabled(Context context, Intent intent) {
         super.onDisabled(context, intent);
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG,"onDisabled");
+        }
         Preference.putBoolean(context, Constants.PreferenceFlag.DEVICE_ACTIVE, false);
         if (!Constants.OWNERSHIP_COSU.equals(Constants.DEFAULT_OWNERSHIP)) {
             Toast.makeText(context, R.string.device_admin_disabled,
@@ -95,6 +99,9 @@ public class AgentDeviceAdminReceiver extends DeviceAdminReceiver implements API
      * @param context - Application context.
      */
     public void startUnRegistration(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG,"startUnRegistration");
+        }
         if (!Constants.OWNERSHIP_COSU.equals(Constants.DEFAULT_OWNERSHIP)) {
             String regId = Preference.getString(context, Constants.PreferenceFlag.REG_ID);
             if (regId != null && !regId.isEmpty()) {
@@ -160,6 +167,9 @@ public class AgentDeviceAdminReceiver extends DeviceAdminReceiver implements API
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onProfileProvisioningComplete(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onProfileProvisioningComplete");
+        }
         Log.i(TAG, "Profile provisioning completed");
         if (Constants.OWNERSHIP_COSU.equals(Constants.DEFAULT_OWNERSHIP)) {
             DevicePolicyManager devicePolicyManager =
@@ -218,6 +228,9 @@ public class AgentDeviceAdminReceiver extends DeviceAdminReceiver implements API
     }
 
     private void startDeviceAdminPrompt(Context context, final ComponentName cdmDeviceAdmin) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "startDeviceAdminPrompt");
+        }
         Intent deviceAdminIntent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         deviceAdminIntent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cdmDeviceAdmin);
         deviceAdminIntent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
@@ -231,20 +244,32 @@ public class AgentDeviceAdminReceiver extends DeviceAdminReceiver implements API
      * @return a {@link ComponentName}
      */
     public static ComponentName getComponentName(Context context) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getComponentName");
+        }
         return new ComponentName(context.getApplicationContext(), AgentDeviceAdminReceiver.class);
     }
 
     public void onLockTaskModeEntering(Context context, Intent intent, String pkg) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onLockTaskModeEntering");
+        }
         Toast.makeText(context, "Device is locked", Toast.LENGTH_LONG).show();
     }
 
     public void onLockTaskModeExiting(Context context, Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onLockTaskModeExisting");
+        }
         Toast.makeText(context, "Device is unlocked", Toast.LENGTH_SHORT).show();
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setUserRestriction(DevicePolicyManager devicePolicyManager,
                                     ComponentName adminComponentName, String restriction, boolean disallow) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "setUserRestriction");
+        }
         if (disallow) {
             devicePolicyManager.addUserRestriction(adminComponentName, restriction);
         } else {

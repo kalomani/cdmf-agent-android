@@ -55,7 +55,7 @@ import java.util.Map;
 
 public class OperationManagerOlderSdk extends OperationManager {
 
-    private static final String TAG = OperationManagerOlderSdk.class.getSimpleName();
+    private static final String TAG = OperationManagerOlderSdk.class.getName();
     private Context context=super.getContext();
     private Resources resources = context.getResources();
     private ResultPayload resultBuilder=super.getResultBuilder();
@@ -65,6 +65,7 @@ public class OperationManagerOlderSdk extends OperationManager {
     public OperationManagerOlderSdk(Context context){
         super(context);
         notificationService = super.getNotificationService();
+        Log.d(TAG, "creation");
     }
 
     @Override

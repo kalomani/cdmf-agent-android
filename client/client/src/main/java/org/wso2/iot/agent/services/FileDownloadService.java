@@ -68,20 +68,29 @@ import static org.wso2.iot.agent.utils.FileTransferUtils.cleanupStreams;
 public class FileDownloadService extends JobIntentService {
     // Unique job ID for this service.
     private static final int JOB_ID = 107;
-    private static final String TAG = FileDownloadService.class.getSimpleName();
+    private static final String TAG = FileDownloadService.class.getName();
     private Resources resources;
     private SharedPreferences.Editor editor;
 
     public FileDownloadService() {
         super(/*TAG*/);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "creation");
+        }
     }
 
     // Convenience method for enqueuing work in to this service.
     public static void enqueueWork(Context context, Intent work) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "enqueueWork");
+        }
         enqueueWork(context, FileDownloadService.class, JOB_ID, work);
     }
     @Override
     protected void onHandleWork(@Nullable Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onHandleWork");
+        }
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Starting File download service");
         }
@@ -105,6 +114,9 @@ public class FileDownloadService extends JobIntentService {
      * @param operation - Operation object.
      */
     public void downloadFile(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "downloadFile");
+        }
         String fileName = null;
         validateOperation(operation);
         try {
@@ -150,6 +162,9 @@ public class FileDownloadService extends JobIntentService {
     }
 
     private void setResponse(Operation operation) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "setResponse");
+        }
         editor.putInt(resources.getString(R.string.FILE_DOWNLOAD_ID), operation.getId());
         editor.putString(resources.getString(R.string.FILE_DOWNLOAD_STATUS), operation.getStatus());
         editor.putString(resources.getString(R.string.FILE_DOWNLOAD_RESPONSE), operation.getOperationResponse());
@@ -159,6 +174,9 @@ public class FileDownloadService extends JobIntentService {
     private void selectDownloadClient(String protocol, Operation operation, String host, String ftpUserName,
                                       String ftpPassword, String savingLocation, String fileName,
                                       int serverPort, String fileDirectory) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "selectDownloadClient");
+        }
         switch (protocol) {
             case Constants.FileTransfer.SFTP:
                 downloadFileUsingSFTPClient(operation, host, ftpUserName, ftpPassword,
@@ -175,6 +193,9 @@ public class FileDownloadService extends JobIntentService {
     }
 
     private void validateOperation(Operation operation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "validateOperation");
+        }
         if (operation == null) {
             throw new AndroidAgentException("Null operation object");
         } else if (operation.getPayLoad() == null) {
@@ -188,6 +209,9 @@ public class FileDownloadService extends JobIntentService {
 
     public void handleOperationError(Operation operation, String message, Exception exception)
             throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "handleOperationError");
+        }
         operation.setStatus(resources.getString(R.string.operation_value_error));
         operation.setOperationResponse(message);
         if (exception != null) {
@@ -199,6 +223,9 @@ public class FileDownloadService extends JobIntentService {
 
     private void printLogs(String ftpUserName, String host, String fileName,
                            String fileDirectory, String savingLocation, int serverPort) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "printLogs");
+        }
         Log.d(TAG, "FTP User Name: " + ftpUserName);
         Log.d(TAG, "FTP host address: " + host);
         Log.d(TAG, "FTP server port: " + serverPort);
@@ -218,6 +245,9 @@ public class FileDownloadService extends JobIntentService {
     private void downloadFileUsingHTTPClient(Operation operation, String url,
                                              String userName, String password,
                                              String savingLocation) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "downloadFileUsingHTTPClient");
+        }
         checkHTTPAuthentication(userName, password);
         InputStream inputStream = null;
         DataInputStream dataInputStream = null;
@@ -244,6 +274,9 @@ public class FileDownloadService extends JobIntentService {
     }
 
     private void checkHTTPAuthentication(String userName, String password) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "checkHTTPAuthentication");
+        }
         if (!userName.isEmpty()) {
             HTTPAuthenticator.setPasswordAuthentication(userName, password);
             Authenticator.setDefault(new HTTPAuthenticator());
@@ -251,6 +284,9 @@ public class FileDownloadService extends JobIntentService {
     }
 
     private String getSavingLocation(Operation operation, String location) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getSavingLocation");
+        }
         String savingLocation;
         if (location.isEmpty()) {
             savingLocation = getSavingLocation();
@@ -264,6 +300,9 @@ public class FileDownloadService extends JobIntentService {
     }
 
     private String getSavingLocation() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "getSavingLocation");
+        }
         if (!Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).
                 exists() && !Environment.getExternalStoragePublicDirectory
                 (Environment.DIRECTORY_DOWNLOADS).mkdirs()) {
@@ -290,6 +329,9 @@ public class FileDownloadService extends JobIntentService {
                                              String ftpUserName, String ftpPassword,
                                              String savingLocation, String fileName, int serverPort,
                                              String fileDirectory) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "downloadFileUsingSFTPClient");
+        }
         Channel channel;
         Session session = null;
         ChannelSftp sftpChannel = null;
@@ -348,6 +390,9 @@ public class FileDownloadService extends JobIntentService {
                                             String ftpUserName, String ftpPassword,
                                             String savingLocation, String fileName, int serverPort,
                                             String fileDirectory) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "downloadFileUsingFTPClient");
+        }
 
         FTPClient ftpClient = new FTPClient();
         FileOutputStream fileOutputStream = null;
@@ -406,6 +451,9 @@ public class FileDownloadService extends JobIntentService {
                                              String ftpUserName, String ftpPassword,
                                              String savingLocation, String fileName, int serverPort,
                                              String fileDirectory) throws AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "downloadFileUsingHFTPSClient");
+        }
         FTPSClient ftpsClient = new FTPSClient();
         FileOutputStream fileOutputStream = null;
         OutputStream outputStream = null;
@@ -453,6 +501,9 @@ public class FileDownloadService extends JobIntentService {
      * @return - Exception cause.
      */
     public String fileTransferExceptionCause(Exception ex, String fileName) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "fileTransferExceptionCause");
+        }
         if (ex.getCause() != null) {
             return fileName + " upload failed. Error :- " + ex.getCause().getMessage();
         } else {
@@ -472,6 +523,9 @@ public class FileDownloadService extends JobIntentService {
      */
     public String[] urlSplitter(Operation operation, String fileURL, boolean isUpload)
             throws URISyntaxException, AndroidAgentException {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "urlSplitter");
+        }
         String serverPort = null;
         URI url = new URI(fileURL);
         String protocol = url.getScheme();

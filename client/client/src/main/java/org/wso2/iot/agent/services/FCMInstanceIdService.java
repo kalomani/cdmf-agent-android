@@ -33,7 +33,7 @@ import org.wso2.iot.agent.utils.Preference;
 
 public class FCMInstanceIdService extends FirebaseInstanceIdService {
 
-    private static final String TAG = FCMInstanceIdService.class.getSimpleName();
+    private static final String TAG = FCMInstanceIdService.class.getName();
 
     @Override
     public void onCreate() {
@@ -42,6 +42,9 @@ public class FCMInstanceIdService extends FirebaseInstanceIdService {
     }
 
     protected void foreground() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "foreground");
+        }
         // launch service in foreground
         int id = 11150;
         Log.i(TAG, "launch service in foreground");
@@ -65,6 +68,9 @@ public class FCMInstanceIdService extends FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onTokenRefresh");
+        }
         // Get updated InstanceID token.
         String token = FirebaseInstanceId.getInstance().getToken();
         if (Constants.DEBUG_MODE_ENABLED){

@@ -18,6 +18,7 @@
 
 package org.wso2.iot.agent.services.screenshare;
 
+import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -54,7 +55,7 @@ import org.wso2.iot.agent.utils.Constants;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class ScreenSharingService extends Service {
 
-    private static final String TAG = ScreenSharingService.class.getSimpleName();
+    private static final String TAG = ScreenSharingService.class.getName();
     public static final String EXTRA_RESULT_CODE = "resultCode";
     public static final String EXTRA_RESULT_INTENT = "resultIntent";
     static final int VIRT_DISPLAY_FLAGS =
@@ -81,6 +82,9 @@ public class ScreenSharingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "creation");
+        }
         foreground();
         IBinder b = ServiceManager.getService(MEDIA_PROJECTION_SERVICE);
         mService = IMediaProjectionManager.Stub.asInterface(b);
@@ -92,6 +96,9 @@ public class ScreenSharingService extends Service {
 
     protected void foreground() {
         // launch service in foreground
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "foreground");
+        }
         int id = 11110;
         Log.i(TAG, "launch service in foreground");
         NotificationCompat.Builder mBuilder = null;
@@ -114,7 +121,9 @@ public class ScreenSharingService extends Service {
 
     @Override
     public int onStartCommand(Intent i, int flags, int startId) {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onStartCommand");
+        }
         try {
             if (Constants.SYSTEM_APP_ENABLED) {
                 PackageManager packageManager = getBaseContext().getPackageManager();
@@ -123,7 +132,8 @@ public class ScreenSharingService extends Service {
                 aInfo = packageManager.getApplicationInfo(getBaseContext().getBasePackageName(), 0);
                 iMediaProjection = mService.createProjection(aInfo.uid, getBaseContext().getBasePackageName(),
                         MediaProjectionManager.TYPE_SCREEN_CAPTURE, true);
-                Intent intent = new Intent().putExtra(MediaProjectionManager.EXTRA_MEDIA_PROJECTION,
+                Intent intent = new Intent();
+                intent.putExtra(MediaProjectionManager.EXTRA_MEDIA_PROJECTION,
                         iMediaProjection.asBinder());
                 projection =
                         mgr.getMediaProjection(i.getIntExtra(EXTRA_RESULT_CODE, -1), intent);
@@ -158,6 +168,9 @@ public class ScreenSharingService extends Service {
 
     @Override
     public void onDestroy() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onDestroy");
+        }
         isScreenShared = false;
         projection.stop();
         super.onDestroy();
@@ -166,7 +179,9 @@ public class ScreenSharingService extends Service {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onConfigurationChanged");
+        }
         ScreenImageReader newIt = new ScreenImageReader(this, maxWidth, maxHeight);
 
         if (newIt.getWidth() != screenImageReader.getWidth() ||
@@ -183,19 +198,30 @@ public class ScreenSharingService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "onBind");
+        }
         return null;
     }
 
     WindowManager getWindowManager() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getWindowManager");
+        }
         return (wmgr);
     }
 
     Handler getHandler() {
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "getHandler");
+        }
         return (handler);
     }
 
     void updateImage(byte[] image, int sizeDiff) {
-
+        if (Constants.DEBUG_MODE_ENABLED) {
+            Log.d(TAG, "updateImage");
+        }
         long currentTime = SystemClock.uptimeMillis();
         screenAllowance += (currentTime - screenLastCheck) * screenSharingRate;
         if (screenAllowance > Constants.SCREEN_SHARING_RATE_IMAGES) {

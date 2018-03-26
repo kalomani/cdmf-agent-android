@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ import org.wso2.iot.agent.utils.Constants;
  * This class handles device lock-down functionality.
  */
 public class KioskRestrictionActivity extends Activity {
+    private static final String TAG = KioskRestrictionActivity.class.getName();
     private TextView textViewWipeData;
     TextView textViewKiosk;
     TextView textViewLaunch;
@@ -44,6 +46,10 @@ public class KioskRestrictionActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onCreate");
+        }
+
         setContentView(R.layout.activity_kiosk_lock_down);
         textViewLaunch = (TextView) findViewById(R.id.textViewLaunch);
         textViewLaunch.setText(Constants.DEVICE_LOCK_NOTICE);
@@ -95,6 +101,8 @@ public class KioskRestrictionActivity extends Activity {
     }
     @Override
     public void onBackPressed() {
-
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "onBackPressed");
+        }
     }
 }

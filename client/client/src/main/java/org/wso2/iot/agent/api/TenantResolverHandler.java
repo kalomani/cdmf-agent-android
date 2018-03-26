@@ -43,7 +43,7 @@ import java.util.Map;
 
 public class TenantResolverHandler {
 
-    private static final String TAG = TenantResolverHandler.class.getSimpleName();
+    private static final String TAG = TenantResolverHandler.class.getName();
 
     private static final String SET_COOKIE_KEY = "Set-Cookie";
     private static final String COOKIE_KEY = "Cookie";
@@ -64,10 +64,16 @@ public class TenantResolverHandler {
     private RequestQueue queue;
 
     public TenantResolverHandler(TenantResolverCallback callback) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "creation");
+        }
         this.callback = callback;
     }
 
     public void resolveTenantDomain(String userName, String password) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "resolveTenantDomain");
+        }
         try {
             queue = ServerUtilities.getCertifiedHttpClient();
         } catch (IDPTokenManagerException e) {
@@ -77,6 +83,9 @@ public class TenantResolverHandler {
     }
 
     private void login(final String userName, final String password) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "login");
+        }
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Login in to cloud manager.");
         }
@@ -100,6 +109,9 @@ public class TenantResolverHandler {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        if (Constants.DEBUG_MODE_ENABLED){
+                            Log.d(TAG, "onErrorResponse");
+                        }
                         AndroidAgentException androidAgentException;
                         if (error.networkResponse != null) {
                             Log.w(TAG, error.toString() + " Status code: " + error.networkResponse.statusCode);
@@ -117,6 +129,9 @@ public class TenantResolverHandler {
         {
             @Override
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                if (Constants.DEBUG_MODE_ENABLED){
+                    Log.d(TAG, "parseNetworkResponse");
+                }
                 setSessionCookie(response.headers);
                 if (Constants.DEBUG_MODE_ENABLED) {
                     Log.d(TAG, "Response status: " + String.valueOf(response.statusCode));
@@ -127,6 +142,9 @@ public class TenantResolverHandler {
 
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+                if (Constants.DEBUG_MODE_ENABLED){
+                    Log.d(TAG, "getParams");
+                }
                 Map<String, String> requestParams = new HashMap<>();
                 requestParams.put(ACTION_LABEL, ACTION);
                 requestParams.put(USERNAME_LABEL, userName);
@@ -136,6 +154,9 @@ public class TenantResolverHandler {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
+                if (Constants.DEBUG_MODE_ENABLED){
+                    Log.d(TAG, "getHeaders");
+                }
                 Map<String, String> headers = new HashMap<>();
                 headers.put(CONTENT_TYPE_HEADER, CONTENT_TYPE_FORM_URL_ENCODED);
                 return headers;
@@ -149,6 +170,9 @@ public class TenantResolverHandler {
     }
 
     private void requestTenantDetails() {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "requestTenantDetails");
+        }
         if (Constants.DEBUG_MODE_ENABLED) {
             Log.d(TAG, "Requesting tenant details from cloud manager.");
         }
@@ -168,6 +192,9 @@ public class TenantResolverHandler {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        if (Constants.DEBUG_MODE_ENABLED){
+                            Log.d(TAG, "onErrorResponse");
+                        }
                         AndroidAgentException androidAgentException;
                         if (error.networkResponse != null) {
                             Log.w(TAG, error.toString() + " Status code: " + error.networkResponse.statusCode);
@@ -185,6 +212,9 @@ public class TenantResolverHandler {
         {
             @Override
             protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                if (Constants.DEBUG_MODE_ENABLED){
+                    Log.d(TAG, "parseNetworkResponse");
+                }
                 if (Constants.DEBUG_MODE_ENABLED) {
                     Log.d(TAG, "Response status: " + String.valueOf(response.statusCode));
                     Log.d(TAG, "Response content: " + new String(response.data));
@@ -194,6 +224,9 @@ public class TenantResolverHandler {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
+                if (Constants.DEBUG_MODE_ENABLED){
+                    Log.d(TAG, "getHeaders");
+                }
                 Map<String, String> headers = new HashMap<>();
                 headers.put(COOKIE_KEY, cookie);
                 return headers;
@@ -211,6 +244,9 @@ public class TenantResolverHandler {
      * @param headers Response Headers.
      */
     private void setSessionCookie(Map<String, String> headers) {
+        if (Constants.DEBUG_MODE_ENABLED){
+            Log.d(TAG, "setSessionCookie");
+        }
         if (headers.containsKey(SET_COOKIE_KEY)
                 && headers.get(SET_COOKIE_KEY).startsWith(SESSION_COOKIE)) {
             String _cookie = headers.get(SET_COOKIE_KEY);
